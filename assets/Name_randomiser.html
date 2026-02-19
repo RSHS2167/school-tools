@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Name Randomiser</title>
+
+  <!-- Google Fonts for a fun mix -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Bangers&family=Lobster&family=Pacifico&family=Roboto+Slab:wght@400;700&family=Fredoka:wght@400;700&family=Concert+One&family=DM+Serif+Display&family=Kalam:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: #12151d;
+      --muted: #8a94a7;
+      --text: #e7ecf3;
+      --acc: #7aa2ff;
+      --acc-2: #4ade80;
+      --danger: #fb7185;
+      --border: #1e2230;
+      --btn: #1a2030;
+      --btn-hover: #232a3d;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 20% -10%, #111729 0%, #0b0d12 40%) fixed,
+                  radial-gradient(900px 700px at 120% 0%, #0e1422 0%, #0b0d12 50%) fixed,
+                  var(--bg);
+    }
+    .container {
+      max-width: 980px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--btn);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform .05s ease, background .2s ease, border-color .2s ease;
+    }
+    .tab-btn[aria-selected="true"] {
+      background: linear-gradient(180deg, #182036, #151b2d);
+      border-color: #2b3350;
+      outline: 2px solid rgba(122,162,255,.25);
+    }
+    .tab-btn:hover { background: var(--btn-hover); transform: translateY(-1px); }
+
+    .panel { display: none; padding: 18px; }
+    .panel.active { display: block; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media (min-width: 900px) {
+      .grid-2 { grid-template-columns: 1.25fr 1fr; }
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      background: #0f1421;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      resize: vertical;
+      min-height: 180px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--btn);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform .05s ease, background .2s ease, border-color .2s ease;
+    }
+    .btn:hover { background: var(--btn-hover); transform: translateY(-1px); }
+    .btn.primary { background: linear-gradient(180deg, #1b2a56, #152246); border-color: #2b3a66; }
+    .btn.accent { background: linear-gradient(180deg, #155b2a, #114922); border-color: #1f7a3a; }
+    .btn.danger { background: linear-gradient(180deg, #5b1521, #49111b); border-color: #7a1f31; }
+    .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .chips {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 10px 0;
+      min-height: 40px;
+    }
+    .chip {
+      border: 1px solid var(--border);
+      background: #0e1524;
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 14px;
+    }
+
+    .stat {
+      border: 1px dashed #26314a;
+      padding: 8px 10px;
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .display {
+      display: grid;
+      place-items: center;
+      height: 280px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background:
+        radial-gradient(1200px 300px at 50% 0%, rgba(122,162,255,0.08), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      position: relative;
+      overflow: hidden;
+    }
+
+    .name {
+      font-size: clamp(28px, 6vw, 64px);
+      line-height: 1.05;
+      letter-spacing: .5px;
+      text-align: center;
+      text-shadow: 0 2px 18px rgba(0,0,0,.5);
+      padding: 0 16px;
+      user-select: none;
+      will-change: transform, filter, opacity;
+      transition: transform .15s ease, filter .15s ease, opacity .15s ease;
+    }
+
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+    .muted { color: var(--muted); font-size: 14px; }
+
+    .footer {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Subtle pulse border during rolling */
+    .display.rolling { animation: glow 0.6s ease-in-out infinite alternate; }
+    @keyframes glow {
+      from { box-shadow: inset 0 0 0 0 rgba(122,162,255,0.15), 0 0 0 0 rgba(122,162,255,0.08); }
+      to   { box-shadow: inset 0 0 0 4px rgba(122,162,255,0.18), 0 8px 40px -8px rgba(122,162,255,0.12); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" role="application" aria-label="Name Randomiser">
+      <div class="tabs" role="tablist" aria-label="Sections">
+        <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-names" id="tab-names">Names</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-picker" id="tab-picker">Picker</button>
+      </div>
+
+      <!-- Names Panel -->
+      <section class="panel active" id="panel-names" role="tabpanel" aria-labelledby="tab-names">
+        <div class="grid grid-2">
+          <div>
+            <h2 style="margin:0 0 8px 0;">Paste names</h2>
+            <p class="muted" style="margin-top:0">One per line or comma-separated. Duplicates and blanks are removed automatically.</p>
+            <textarea id="names-input" placeholder="e.g.
+Alice
+Bob
+Charlie, Dana
+Elliot"></textarea>
+            <div class="row" style="margin-top:10px;">
+              <button class="btn primary" id="btn-load">Load names (replace)</button>
+              <button class="btn" id="btn-add">Add to list</button>
+              <button class="btn" id="btn-clear">Clear</button>
+              <button class="btn" id="btn-sample">Load sample</button>
+            </div>
+          </div>
+
+          <div>
+            <h2 style="margin:0 0 8px 0;">Current list</h2>
+            <div class="row" style="margin-bottom:8px;">
+              <span class="stat"><strong>Total:</strong> <span id="count">0</span></span>
+              <button class="btn" id="btn-export">Export list</button>
+            </div>
+            <div id="chips" class="chips" aria-live="polite" aria-atomic="true"></div>
+            <p class="muted">Tip: Switch to the <strong>Picker</strong> tab to start rolling.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Picker Panel -->
+      <section class="panel" id="panel-picker" role="tabpanel" aria-labelledby="tab-picker">
+        <div class="grid">
+          <div class="display" id="display">
+            <div class="name" id="name">Add some names to begin</div>
+          </div>
+          <div class="controls" style="margin-top:12px;">
+            <button class="btn primary" id="btn-roll">Roll (3s)</button>
+            <button class="btn accent" id="btn-remove-roll" disabled>Remove name & roll again</button>
+            <button class="btn danger" id="btn-remove" disabled>Remove selected</button>
+          </div>
+          <div class="row" style="justify-content:center;">
+            <span class="stat"><strong>Remaining:</strong> <span id="remaining">0</span></span>
+          </div>
+          <p class="muted" style="text-align:center;margin:8px 0 0 0;">
+            Rolling flashes through names quickly, then slows down and lands on one fairly.
+          </p>
+        </div>
+      </section>
+
+      <div class="footer">
+        <span>Dark mode • 3-second slow-down animation • Random font per name</span>
+        <span id="status" aria-live="polite"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- State & Utilities ----------------------------------------------------
+    const LS_KEY = "name_randomiser_list_v1";
+
+    /** Fonts pool; each name maps to one of these for consistent 'random' styling */
+    const FONT_STACKS = [
+      "'Bangers', system-ui, sans-serif",
+      "'Lobster', system-ui, sans-serif",
+      "'Pacifico', system-ui, cursive",
+      "'Roboto Slab', Georgia, serif",
+      "'Fredoka', system-ui, sans-serif",
+      "'Concert One', system-ui, sans-serif",
+      "'DM Serif Display', Georgia, serif",
+      "'Kalam', 'Comic Sans MS', cursive, sans-serif",
+      "'Orbitron', system-ui, sans-serif",
+      "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
+    ];
+
+    /** Deterministic hash for string -> number (for font selection) */
+    function hashString(str) {
+      let h = 2166136261 >>> 0; // FNV-1a base
+      for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return (h >>> 0);
+    }
+
+    /** Get a consistent font stack for a name */
+    function fontFor(name) {
+      if (!name) return FONT_STACKS[FONT_STACKS.length - 1];
+      const idx = hashString(name) % FONT_STACKS.length;
+      return FONT_STACKS[idx];
+    }
+
+    /** Parse text into an array of unique trimmed names */
+    function parseNames(text) {
+      const parts = text
+        .split(/[\n,]+/g)
+        .map(s => s.trim())
+        .filter(Boolean);
+      // Deduplicate preserving order
+      const seen = new Set();
+      const out = [];
+      for (const p of parts) {
+        const key = p.toLowerCase();
+        if (!seen.has(key)) {
+          seen.add(key);
+          out.push(p);
+        }
+      }
+      return out;
+    }
+
+    function saveList(list) {
+      localStorage.setItem(LS_KEY, JSON.stringify(list));
+    }
+    function loadList() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return [];
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      } catch { return []; }
+    }
+
+    // --- DOM refs -------------------------------------------------------------
+    const tabs = {
+      names: document.getElementById('tab-names'),
+      picker: document.getElementById('tab-picker')
+    };
+    const panels = {
+      names: document.getElementById('panel-names'),
+      picker: document.getElementById('panel-picker')
+    };
+
+    const namesInput = document.getElementById('names-input');
+    const chips = document.getElementById('chips');
+    const countEl = document.getElementById('count');
+    const remainingEl = document.getElementById('remaining');
+    const statusEl = document.getElementById('status');
+
+    const btnLoad = document.getElementById('btn-load');
+    const btnAdd = document.getElementById('btn-add');
+    const btnClear = document.getElementById('btn-clear');
+    const btnSample = document.getElementById('btn-sample');
+    const btnExport = document.getElementById('btn-export');
+
+    const display = document.getElementById('display');
+    const nameEl = document.getElementById('name');
+    const btnRoll = document.getElementById('btn-roll');
+    const btnRemoveRoll = document.getElementById('btn-remove-roll');
+    const btnRemove = document.getElementById('btn-remove');
+
+    // --- App state ------------------------------------------------------------
+    let list = loadList();
+    let selected = null;
+    let rolling = false;
+
+    // --- UI helpers -----------------------------------------------------------
+    function renderList() {
+      chips.innerHTML = '';
+      list.forEach((n, i) => {
+        const s = document.createElement('span');
+        s.className = 'chip';
+        s.textContent = n;
+        s.title = 'Click to remove';
+        s.style.cursor = 'pointer';
+        s.onclick = () => {
+          if (rolling) return;
+          list.splice(i, 1);
+          saveList(list);
+          renderList();
+          updateCounts();
+        };
+        chips.appendChild(s);
+      });
+      countEl.textContent = String(list.length);
+      remainingEl.textContent = String(list.length);
+      if (list.length === 0) {
+        nameEl.style.fontFamily = FONT_STACKS[FONT_STACKS.length - 1];
+        nameEl.textContent = 'Add some names to begin';
+      }
+      updateButtons();
+    }
+
+    function updateButtons() {
+      const hasNames = list.length > 0;
+      btnRoll.disabled = !hasNames || rolling;
+      btnRemove.disabled = !selected || rolling;
+      btnRemoveRoll.disabled = !selected || !hasNames || rolling || (list.length <= 1 && selected && list.includes(selected));
+    }
+
+    function updateCounts() {
+      countEl.textContent = String(list.length);
+      remainingEl.textContent = String(list.length);
+      updateButtons();
+    }
+
+    function setStatus(msg) {
+      statusEl.textContent = msg || '';
+    }
+
+    function setDisplayName(n) {
+      nameEl.style.opacity = '0.9';
+      nameEl.style.transform = 'scale(1.02)';
+      nameEl.style.filter = 'drop-shadow(0 6px 20px rgba(0,0,0,.35))';
+      nameEl.textContent = n;
+      nameEl.style.fontFamily = fontFor(n);
+      // subtle pop
+      requestAnimationFrame(() => {
+        nameEl.style.transform = 'scale(1.0)';
+      });
+    }
+
+    // --- Tabs -----------------------------------------------------------------
+    function showPanel(which) {
+      const other = which === 'names' ? 'picker' : 'names';
+      panels[which].classList.add('active');
+      panels[other].classList.remove('active');
+      tabs[which].setAttribute('aria-selected', 'true');
+      tabs[other].setAttribute('aria-selected', 'false');
+    }
+
+    tabs.names.addEventListener('click', () => showPanel('names'));
+    tabs.picker.addEventListener('click', () => showPanel('picker'));
+
+    // --- Names panel actions --------------------------------------------------
+    btnLoad.addEventListener('click', () => {
+      if (rolling) return;
+      const names = parseNames(namesInput.value);
+      list = names;
+      saveList(list);
+      renderList();
+      setStatus(`Loaded ${names.length} name${names.length===1?'':'s'}.`);
+    });
+
+    btnAdd.addEventListener('click', () => {
+      if (rolling) return;
+      const names = parseNames(namesInput.value);
+      const existing = new Set(list.map(x => x.toLowerCase()));
+      const toAdd = names.filter(n => !existing.has(n.toLowerCase()));
+      list.push(...toAdd);
+      saveList(list);
+      renderList();
+      setStatus(`Added ${toAdd.length} new name${toAdd.length===1?'':'s'}.`);
+    });
+
+    btnClear.addEventListener('click', () => {
+      if (rolling) return;
+      if (!confirm('Clear the entire list?')) return;
+      list = [];
+      saveList(list);
+      selected = null;
+      renderList();
+      setStatus('List cleared.');
+    });
+
+    btnSample.addEventListener('click', () => {
+      if (rolling) return;
+      namesInput.value = [
+        'Aaliyah', 'Ben', 'Chloe', 'Dylan', 'Ethan',
+        'Freya', 'Grace', 'Harper', 'Isla', 'Jack',
+        'Kai', 'Liam', 'Mia', 'Noah', 'Olivia',
+        'Piper', 'Quinn', 'Riley', 'Sophie', 'Tyler'
+      ].join('\n');
+      setStatus('Loaded a sample list into the textbox (click Load or Add).');
+    });
+
+    btnExport.addEventListener('click', () => {
+      const blob = new Blob([list.join('\n')], {type: 'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'names.txt';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setStatus('Exported current list.');
+    });
+
+    // --- Picker logic ---------------------------------------------------------
+    function pickTargetIndex() {
+      // Fair random among current list
+      return Math.floor(Math.random() * list.length);
+    }
+
+    // Easing (easeOutCubic)
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+    /** Run a 3s rolling animation that ends on targetIdx */
+    async function rollTo(targetIdx, durationMs = 3000) {
+      if (list.length === 0) return;
+      rolling = true;
+      updateButtons();
+      display.classList.add('rolling');
+      setStatus('Rolling…');
+
+      const start = performance.now();
+      let shownIndex = Math.floor(Math.random() * list.length);
+      let lastTick = start;
+
+      // min/max delay between flashes (start fast, end slower)
+      const minDelay = 30;    // ms at the start
+      const maxDelay = 220;   // ms near the end
+
+      // To help ensure we land on target, during the last ~400ms bias toward target
+      const snapWindow = 400;
+
+      return new Promise(resolve => {
+        function tick(now) {
+          const elapsed = now - start;
+          const t = Math.min(1, elapsed / durationMs);
+          const eased = easeOutCubic(t);
+          const delay = minDelay + (maxDelay - minDelay) * eased;
+
+          if (elapsed >= durationMs - snapWindow) {
+            // Bias towards target as we approach the end
+            shownIndex = targetIdx;
+          } else {
+            // Show a (different) random index quickly
+            let next = shownIndex;
+            if (list.length > 1) {
+              while (next === shownIndex) {
+                next = Math.floor(Math.random() * list.length);
+              }
+            }
+            shownIndex = next;
+          }
+
+          setDisplayName(list[shownIndex]);
+
+          if (elapsed >= durationMs) {
+            // Finalise
+            selected = list[targetIdx];
+            setDisplayName(selected);
+            display.classList.remove('rolling');
+            rolling = false;
+            updateButtons();
+            setStatus('Done.');
+            resolve();
+            return;
+          }
+          // Schedule next tick with variable delay
+          const dt = now - lastTick;
+          if (dt >= delay) {
+            lastTick = now;
+          }
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    async function startRoll() {
+      if (rolling) return;
+      if (list.length === 0) {
+        setStatus('Please add names first.');
+        return;
+      }
+      // Choose a random target each roll
+      const targetIdx = pickTargetIndex();
+      await rollTo(targetIdx, 3000);
+      btnRemove.disabled = false;
+      btnRemoveRoll.disabled = list.length > 1 ? false : true;
+    }
+
+    btnRoll.addEventListener('click', startRoll);
+
+    btnRemove.addEventListener('click', () => {
+      if (rolling || !selected) return;
+      const idx = list.findIndex(n => n === selected);
+      if (idx >= 0) {
+        list.splice(idx, 1);
+        saveList(list);
+        setStatus(`Removed “${selected}”.`);
+        selected = null;
+        renderList();
+        updateCounts();
+        // Show a prompt if list still has items
+        if (list.length > 0) {
+          nameEl.textContent = 'Press Roll to pick another';
+          nameEl.style.fontFamily = FONT_STACKS[FONT_STACKS.length - 1];
+        }
+      }
+    });
+
+    btnRemoveRoll.addEventListener('click', async () => {
+      if (rolling || !selected) return;
+      // Remove current selected then roll again if any left
+      const idx = list.findIndex(n => n === selected);
+      if (idx >= 0) {
+        list.splice(idx, 1);
+        saveList(list);
+        setStatus(`Removed “${selected}”. Rolling again…`);
+        selected = null;
+        renderList();
+        updateCounts();
+        if (list.length > 0) {
+          await startRoll();
+        } else {
+          setStatus('No names left.');
+        }
+      }
+    });
+
+    // --- Init ----------------------------------------------------------------
+    function init() {
+      renderList();
+      updateCounts();
+      setStatus('');
+      // If there’s an existing list, switch straight to Picker
+      if (list.length > 0) {
+        showPanel('picker');
+      }
+    }
+    init();
+  </script>
+</body>
+</html>

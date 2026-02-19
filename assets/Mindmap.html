@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mindmap</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Comic Sans MS', sans-serif;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Fredoka&family=Permanent+Marker&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+</head>
+<body>
+<!-- Canvas -->
+<canvas id="mapCanvas"></canvas>
+
+<!-- Fixed UI: Title, Instructions & Buttons -->
+<div style="position: fixed; top: 10px; left: 20px; z-index: 10; font-family: 'Comic Sans MS', sans-serif;">
+  <h1 style="margin: 0;">🧠 Mindmap</h1>
+  <p style="margin: 5px 0 10px; font-size: 14px; line-height: 1.4;">
+    👉 <strong>Click</strong> anywhere to add a bubble.<br>
+    👉 <strong>Click a bubble, then another</strong> to link.<br>
+    👉 <strong>Double-click</strong> a bubble to edit.<br>
+    👉 <strong>Scroll</strong> to zoom. <strong>Drag</strong> to move.
+  </p>
+</div>
+
+<div style="position: fixed; top: 10px; right: 20px; z-index: 10; display: flex; align-items: center; gap: 10px;">
+  <button onclick="saveProject()" style="padding: 6px 12px;">💾 Save</button>
+  <button onclick="document.getElementById('loadFile').click()" style="padding: 6px 12px;">📂 Load</button>
+  <input type="file" id="loadFile" style="display: none;" accept=".json" onchange="loadProject(event)">
+  <select id="themeSelect" onchange="applyTheme()" style="padding: 6px 8px;">
+    <option value="default">🌈 Theme</option>
+    <option value="fire">🔥 Fire</option>
+    <option value="water">💧 Water</option>
+    <option value="summer">🌞 Summer</option>
+    <option value="dark">🌙 Dark Mode</option>
+  </select>
+</div>
+
+
+
+<script>
+
+let scale = 1;
+let offset = { dx: 0, dy: 0 };
+
+
+const canvas = document.getElementById('mapCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// ✅ Now it's safe to add the zoom event listener
+canvas.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const zoomAmount = 0.1;
+  const mouseX = e.clientX;
+  const mouseY = e.clientY;
+
+  const direction = e.deltaY > 0 ? -1 : 1;
+  const factor = 1 + zoomAmount * direction;
+
+  offset.dx = mouseX - (mouseX - offset.dx) * factor;
+  offset.dy = mouseY - (mouseY - offset.dy) * factor;
+
+  scale *= factor;
+});
+
+
+let nodes = [];
+let links = [];
+let dragging = null;
+let offsetX = 0;
+let offsetY = 0;
+let connectingFrom = null;
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+let initialOffset = { dx: 0, dy: 0 };
+let dragOffset = { x: 0, y: 0 };
+let mouseDownPos = null;
+let currentTheme = "default";
+let themeBackground = "#ffffff";
+let clickedCandidateNode = null;
+
+function applyTheme() {
+  const theme = document.getElementById("themeSelect").value;
+  currentTheme = theme;
+
+  let font = "'Comic Sans MS', cursive";
+  let textColor = "#000";
+
+  switch (theme) {
+    case "fire":
+      themeBackground = "#ffefec";
+      textColor = "#440000";
+      font = "'Permanent Marker', cursive";
+      break;
+    case "water":
+      themeBackground = "#e0f7ff";
+      textColor = "#003344";
+      font = "'Architects Daughter', cursive";
+      break;
+    case "summer":
+      themeBackground = "#fffbe7";
+      textColor = "#665500";
+      font = "'Fredoka', sans-serif";
+      break;
+    case "dark":
+      themeBackground = "#1e1e1e";
+      textColor = "#eeeeee";
+      font = "'Share Tech Mono', monospace";
+      break;
+    default:
+      themeBackground = "#ffffff";
+      textColor = "#000000";
+      font = "'Comic Sans MS', cursive";
+  }
+
+  document.body.style.backgroundColor = themeBackground;
+  document.body.style.color = textColor;
+  document.body.style.fontFamily = font;
+
+  // Optional: update canvas node font too
+  nodes.forEach(n => {
+    n.font = font;
+  });
+}
+
+
+
+
+class Node {
+  constructor(x, y, text = "New Thought") {
+    this.baseX = x;
+    this.baseY = y;
+    this.x = x;
+    this.y = y;
+    this.text = text;
+    this.color = "#" + Math.floor(Math.random() * 16777215).toString(16);
+    this.floatAngle = Math.random() * Math.PI * 2;
+    this.floatSpeed = 0.005 + Math.random() * 0.005;
+    this.floatRadius = 5 + Math.random() * 5;
+    this.fontSize = 14;
+    this.radius = 60;
+    this.font = "'Comic Sans MS'";  // ✅ Set default font here
+  }
+
+  getLines() {
+    ctx.font = `${this.fontSize}px ${this.font}`;  // ✅ Use theme-updated font
+    const words = this.text.split(" ");
+    const lines = [];
+    let line = "";
+    const maxLineWidth = this.radius * 1.6;
+
+    for (let word of words) {
+      const testLine = line + word + " ";
+      if (ctx.measureText(testLine).width > maxLineWidth && line !== "") {
+        lines.push(line.trim());
+        line = word + " ";
+      } else {
+        line = testLine;
+      }
+    }
+    lines.push(line.trim());
+    return lines;
+  }
+
+
+  updateSize() {
+    ctx.font = `${this.fontSize}px sans-serif`;
+    const lines = this.getLines();
+    const maxWidth = Math.max(...lines.map(line => ctx.measureText(line).width));
+    const textHeight = lines.length * this.fontSize * 1.2;
+    this.radius = Math.max(40, Math.sqrt(maxWidth ** 2 + textHeight ** 2) / 2 + 10);
+  }
+
+  update() {
+    this.floatAngle += this.floatSpeed;
+    this.x = this.baseX + Math.cos(this.floatAngle) * this.floatRadius;
+    this.y = this.baseY + Math.sin(this.floatAngle) * this.floatRadius;
+    this.updateSize();
+  }
+  
+
+  draw() {
+    this.updateSize();
+
+    ctx.beginPath();
+    ctx.fillStyle = this.color;
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    const r = parseInt(this.color.substr(1, 2), 16);
+    const g = parseInt(this.color.substr(3, 2), 16);
+    const b = parseInt(this.color.substr(5, 2), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    const textColor = brightness > 150 ? "black" : "white";
+
+    ctx.fillStyle = textColor;
+    ctx.font = `${this.fontSize}px sans-serif`;
+    ctx.textAlign = "center";
+
+    const lines = this.getLines();
+    const totalHeight = lines.length * this.fontSize * 1.2;
+    lines.forEach((line, i) => {
+      ctx.fillText(line, this.x, this.y - totalHeight / 2 + (i + 1) * this.fontSize * 1.2 - 4);
+    });
+  }
+
+  isInside(x, y) {
+    return Math.hypot(this.baseX - x, this.baseY - y) <= this.radius;
+  }
+
+
+
+}
+
+
+function draw() {
+  // Set transform for zooming and panning
+  ctx.setTransform(scale, 0, 0, scale, offset.dx, offset.dy);
+
+  // Clear only the visible portion of the canvas
+  ctx.fillStyle = themeBackground;
+  ctx.fillRect(-offset.dx / scale, -offset.dy / scale, canvas.width / scale, canvas.height / scale);
+
+  // Draw connecting lines (links) between base positions
+  links.forEach(([a, b]) => {
+    const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+    grad.addColorStop(0, a.color);
+    grad.addColorStop(1, b.color);
+    ctx.beginPath();
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 4;
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  });
+
+
+  // Draw and animate bubbles
+  nodes.forEach(n => {
+    if (!dragging || dragging !== n) n.update();
+    n.draw();
+  });
+
+  // Repeat drawing on next frame
+  requestAnimationFrame(draw);
+}
+
+
+canvas.addEventListener("mousedown", (e) => {
+  const canvasX = (e.clientX - offset.dx) / scale;
+  const canvasY = (e.clientY - offset.dy) / scale;
+  mouseDownPos = { x: e.clientX, y: e.clientY };
+
+  // 🖱 Middle click for panning
+  if (e.button === 1) {
+    isPanning = true;
+    panStart = { x: e.clientX, y: e.clientY };
+    initialOffset = { dx: offset.dx, dy: offset.dy };
+    e.preventDefault();
+    return;
+  }
+
+  // 👈 Left click
+  if (e.button === 0) {
+    let clickedNode = null;
+
+    for (let n of nodes) {
+      if (n.isInside(canvasX, canvasY)) {
+        clickedNode = n;
+        break;
+      }
+    }
+
+    if (clickedNode) {
+      clickedCandidateNode = clickedNode;
+
+      // Start dragging
+      dragging = clickedNode;
+      dragOffset.x = canvasX - clickedNode.baseX;
+      dragOffset.y = canvasY - clickedNode.baseY;
+      return;
+    }
+
+    // If no node clicked, cancel linking
+    if (connectingFrom) {
+      connectingFrom = null;
+      return;
+    }
+
+    // Otherwise, create new node
+    const text = prompt("Enter idea text:");
+    if (text) {
+      const newNode = new Node(canvasX, canvasY, text);
+      nodes.push(newNode);
+    }
+  }
+});
+
+
+
+
+
+
+
+canvas.addEventListener("mousemove", (e) => {
+  if (isPanning) {
+    offset.dx = initialOffset.dx + (e.clientX - panStart.x);
+    offset.dy = initialOffset.dy + (e.clientY - panStart.y);
+  } else if (dragging) {
+    const x = (e.clientX - offset.dx) / scale;
+    const y = (e.clientY - offset.dy) / scale;
+    dragging.baseX = x - dragOffset.x;
+    dragging.baseY = y - dragOffset.y;
+    dragging.x = dragging.baseX; // Snap x
+    dragging.y = dragging.baseY; // Snap y
+  }
+
+
+});
+
+
+
+
+canvas.addEventListener("mouseup", (e) => {
+  if (e.button === 1) {
+    isPanning = false;
+    return;
+  }
+
+  if (e.button === 0) {
+    dragging = null;
+
+    // If user clicked (not dragged), and was on a node
+    if (
+      clickedCandidateNode &&
+      mouseDownPos &&
+      Math.hypot(e.clientX - mouseDownPos.x, e.clientY - mouseDownPos.y) < 5
+    ) {
+      if (connectingFrom && connectingFrom !== clickedCandidateNode) {
+        // Check if link already exists
+        const existingIndex = links.findIndex(([a, b]) =>
+          (a === connectingFrom && b === clickedCandidateNode) ||
+          (a === clickedCandidateNode && b === connectingFrom)
+        );
+
+        if (existingIndex !== -1) {
+          // 🔄 Unlink if already connected
+          links.splice(existingIndex, 1);
+        } else {
+          // ➕ Add link if not already connected
+          links.push([connectingFrom, clickedCandidateNode]);
+        }
+
+        connectingFrom = null;
+      } else {
+        // Start new connection from clicked node
+        connectingFrom = clickedCandidateNode;
+      }
+    }
+
+    clickedCandidateNode = null;
+    mouseDownPos = null;
+  }
+});
+
+
+
+
+canvas.addEventListener("contextmenu", (e) => {
+  if (e.button === 1) e.preventDefault(); // prevent wheel click menu
+});
+
+
+
+
+canvas.addEventListener("dblclick", (e) => {
+  const x = (e.clientX - offset.dx) / scale;
+  const y = (e.clientY - offset.dy) / scale;
+
+  for (let i = 0; i < nodes.length; i++) {
+    const n = nodes[i];
+    if (n.isInside(x, y)) {
+      const container = document.createElement("div");
+      container.style.position = "fixed";
+      container.style.left = `${e.clientX}px`;
+      container.style.top = `${e.clientY}px`;
+      container.style.background = "#fff";
+      container.style.border = "1px solid #ccc";
+      container.style.padding = "10px";
+      container.style.boxShadow = "0 2px 10px rgba(0,0,0,0.3)";
+      container.style.zIndex = 9999;
+      container.style.fontFamily = "sans-serif";
+
+      const input = document.createElement("textarea");
+      input.value = n.text;
+      input.style.width = "250px";
+      input.style.height = "80px";
+      input.style.marginBottom = "10px";
+      container.appendChild(input);
+
+      const buttonRow = document.createElement("div");
+      buttonRow.style.display = "flex";
+      buttonRow.style.justifyContent = "space-between";
+      buttonRow.style.gap = "10px";
+
+      const saveBtn = document.createElement("button");
+      saveBtn.textContent = "💾 Save";
+      saveBtn.onclick = () => {
+        n.text = input.value.trim();
+        document.body.removeChild(container);
+      };
+
+      const cancelBtn = document.createElement("button");
+      cancelBtn.textContent = "❌ Cancel";
+      cancelBtn.onclick = () => {
+        document.body.removeChild(container);
+      };
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "🗑 Delete";
+      deleteBtn.style.backgroundColor = "#d33";
+      deleteBtn.style.color = "#fff";
+      deleteBtn.onclick = () => {
+        nodes.splice(i, 1);
+        // Remove links involving this node
+        links = links.filter(([a, b]) => a !== n && b !== n);
+        document.body.removeChild(container);
+      };
+
+      buttonRow.appendChild(saveBtn);
+      buttonRow.appendChild(cancelBtn);
+      buttonRow.appendChild(deleteBtn);
+      container.appendChild(buttonRow);
+
+      document.body.appendChild(container);
+      return;
+    }
+  }
+});
+
+
+function saveProject() {
+  const data = {
+    nodes: nodes.map(n => ({
+      x: n.baseX,
+      y: n.baseY,
+      text: n.text,
+      color: n.color,
+      floatAngle: n.floatAngle,
+      floatSpeed: n.floatSpeed,
+      floatRadius: n.floatRadius
+    })),
+    links: links.map(([a, b]) => [
+      nodes.indexOf(a),
+      nodes.indexOf(b)
+    ])
+  };
+
+  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "mindmap.json";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function loadProject(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    alert("No file selected.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.nodes || !data.links) throw new Error("Invalid file format");
+
+      nodes = data.nodes.map(n => {
+		  const newNode = new Node(n.x, n.y, n.text);
+		  newNode.color = /^#[0-9A-Fa-f]{6}$/.test(n.color) ? n.color : '#cccccc';  // ✅ Validate or fallback
+		  newNode.floatAngle = n.floatAngle;
+		  newNode.floatSpeed = n.floatSpeed;
+		  newNode.floatRadius = n.floatRadius;
+		  newNode.font = "'Comic Sans MS'";
+		  newNode.updateSize();
+		  return newNode;
+		});
+
+      links = data.links.map(([i, j]) => [nodes[i], nodes[j]]);
+      applyTheme(); // Ensures theme styling is reapplied after loading
+    } catch (err) {
+      alert("Failed to load mindmap: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+
+
+draw();
+</script>
+</body>
+</html>
+
+
+

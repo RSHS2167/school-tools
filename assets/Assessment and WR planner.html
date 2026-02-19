@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Runcorn State High School Assessment & Writing Planner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* VARIABLES - Original Dark Theme */
+    :root {
+      --bg-dark: #001b3a;
+      --gold: #f4c542;
+      --white: #ffffff;
+      --text-main: #f5f5f5;
+      --card-bg: #0a1730;
+      --step-border: #2c4c73;
+      --link-color: #f4c542;
+      --btn-hover: #e0b037;
+    }
+
+    /* BASE STYLES */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 20px;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* HEADER */
+    header {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .school-logo {
+      max-height: 80px;
+      margin-bottom: 8px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    /* MASTER CONTROL BAR (Top Dropdown) */
+    .master-control {
+      background: var(--gold);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .master-control label {
+      font-weight: 800;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+    }
+
+    .master-control select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 4px;
+      border: 2px solid #000;
+      font-size: 1rem;
+      font-weight: 600;
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+    }
+
+    /* TAB BAR */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tab-button {
+      flex: 1;
+      min-width: 150px;
+      border-radius: 999px;
+      border: 2px solid #000;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: #f6d872;
+      color: #000;
+      text-align: center;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .tab-button:hover {
+      background: #ffe28d;
+      transform: translateY(-1px);
+    }
+
+    .tab-button.active {
+      background: #000;
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+
+    /* FORM SECTION */
+    .form-section {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      margin-bottom: 30px;
+      border: 1px solid var(--step-border);
+    }
+
+    .form-section h2 {
+      font-size: 1.25rem;
+      color: var(--gold);
+      margin-bottom: 15px;
+      border-bottom: 1px solid var(--step-border);
+      padding-bottom: 10px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .form-group label {
+      font-size: 0.9rem;
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: #040e1f;
+      color: var(--text-main);
+      font-size: 1rem;
+    }
+
+    .form-group input[type="date"] {
+      color-scheme: dark;
+    }
+
+    #newSubjectGroup input {
+      border: 2px solid var(--gold);
+      background: #000;
+    }
+
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: var(--btn-hover);
+    }
+
+    .btn-secondary {
+      background: #444;
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: #555;
+    }
+
+    .btn-download {
+      background: #2c4c73;
+      color: #fff;
+    }
+
+    .btn-download:hover {
+      background: #3d6a9f;
+    }
+
+    .hint {
+      font-size: 0.85rem;
+      margin-top: 10px;
+      opacity: 0.85;
+    }
+
+    .error {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #ffb3b3;
+      background: rgba(255, 0, 0, 0.1);
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
+    }
+
+    /* RESULTS SECTION */
+    .results-section {
+      margin-top: 30px;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--step-border);
+    }
+
+    .results-header h2 {
+      font-size: 1.5rem;
+      color: var(--gold);
+    }
+
+    .task-label {
+      font-size: 1rem;
+      font-weight: 600;
+      opacity: 0.95;
+      text-align: right;
+    }
+
+    .no-plan {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin-top: 15px;
+      text-align: centre;
+    }
+
+    /* STEP GROUPS */
+    .step-group {
+      border: 2px solid var(--gold);
+      border-radius: 18px;
+      padding: 12px;
+      margin-bottom: 16px;
+      background: rgba(244, 197, 66, 0.04);
+    }
+
+    .step-group-middle {
+      background: rgba(244, 197, 66, 0.03);
+    }
+
+    /* STEP CARDS */
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .step-card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 15px;
+      border-left: 5px solid var(--gold);
+      transition: background 0.3s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .step-card:hover {
+      background: #112547;
+    }
+
+    .step-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+
+    .step-info {
+      display: flex;
+      align-items: flex-start;
+      flex: 1 1 auto;
+      min-width: 0;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    .step-tool {
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--gold);
+      flex: 1 1 auto;
+      min-width: 0;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .step-dates {
+      font-size: 0.85rem;
+      font-weight: 500;
+      opacity: 0.8;
+      margin-left: auto;
+      text-align: right;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    .percent-tag {
+      font-weight: 600;
+      font-size: 0.8rem;
+      background: rgba(244, 197, 66, 0.1);
+      color: var(--gold);
+      padding: 4px 8px;
+      border-radius: 4px;
+      min-width: 50px;
+      text-align: centre;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    /* EXPANDED DETAILS */
+    .step-details {
+      padding-top: 15px;
+      margin-top: 15px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+      font-size: 0.9rem;
+      color: var(--text-main);
+      display: none;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 768px) {
+      .step-details {
+        grid-template-columns: 1.5fr 1fr;
+      }
+    }
+
+    .detail-column h4 {
+      color: var(--gold);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      border-bottom: 1px solid rgba(244, 197, 66, 0.3);
+      padding-bottom: 4px;
+      display: inline-block;
+    }
+
+    .detail-column ul {
+      margin-left: 18px;
+      list-style-type: '— ';
+      margin-bottom: 10px;
+    }
+
+    .detail-column li {
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .resource-link {
+      color: var(--link-color);
+      text-decoration: none;
+    }
+
+    .resource-link:hover {
+      text-decoration: underline;
+    }
+
+    .tools-list {
+      margin-top: 6px;
+      margin-left: 18px;
+      list-style-type: '• ';
+    }
+
+    .tools-list li {
+      margin-bottom: 6px;
+    }
+
+    .ai-prompt-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 10px 10px 8px 10px;
+      font-family: "Courier New", monospace;
+      font-size: 0.85rem;
+      color: #e0e0e0;
+      margin-top: 5px;
+      position: relative;
+    }
+
+    .ai-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 4px;
+      display: block;
+      font-weight: 700;
+    }
+
+    .ai-prompt-text {
+      white-space: pre-wrap;
+    }
+
+    .copy-prompt-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: none;
+      background: #2c4c73;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .copy-prompt-btn:hover {
+      background: #3d6a9f;
+    }
+
+    /* --- PRINT STYLES --- */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0;
+      }
+
+      .page {
+        box-shadow: none !important;
+        margin: 0;
+        max-width: none;
+        padding: 0;
+        background: transparent !important;
+      }
+
+      .form-section,
+      .master-control,
+      .buttons,
+      .hint,
+      .error,
+      .no-plan {
+        display: none !important;
+      }
+
+      header {
+        margin-bottom: 10px;
+        text-align: left;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+      }
+
+      header h1 {
+        font-size: 1.6rem;
+        color: #000 !important;
+        margin-bottom: 0;
+      }
+
+      header p {
+        font-size: 0.9rem;
+        color: #444;
+      }
+
+      .school-logo {
+        display: none !important;
+      }
+
+      .results-section {
+        margin-top: 0;
+      }
+
+      .results-header {
+        border-bottom: 1px solid #000;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        display: block;
+      }
+
+      .results-header h2 {
+        font-size: 1.2rem;
+        color: #000 !important;
+        display: none;
+      }
+
+      .task-label {
+        text-align: left;
+        font-size: 1.1rem;
+        color: #000 !important;
+        font-weight: bold;
+      }
+
+      .step-group {
+        border: none !important;
+        padding: 0;
+        margin-bottom: 0;
+      }
+
+      .steps-list {
+        display: block;
+        gap: 0;
+      }
+
+      .step-card {
+        border: none !important;
+        border-bottom: 1px solid #ccc !important;
+        border-left: 5px solid #000 !important;
+        background: #fff !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        margin-bottom: 0;
+        padding: 8px 10px;
+        border-radius: 0;
+        page-break-inside: avoid;
+      }
+
+      .step-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: centre;
+        width: 100%;
+      }
+
+      .step-info {
+        gap: 10px;
+        width: 100%;
+        display: flex;
+        align-items: baseline;
+      }
+
+      .step-title {
+        font-weight: bold;
+        font-size: 1rem;
+        color: #000 !important;
+        min-width: 160px;
+      }
+
+      .step-tool {
+        font-size: 0.9rem;
+        color: #444 !important;
+        font-style: italic;
+      }
+
+      .step-dates {
+        font-weight: bold;
+        color: #000 !important;
+        margin-left: auto;
+      }
+
+      .step-details {
+        display: none !important;
+      }
+
+      .percent-tag {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header>
+      <img src="https://runcornshs.eq.edu.au/SiteCollectionImages/sitelogo.png" alt="Runcorn State High School logo"
+        class="school-logo">
+      <h1 id="mainHeading">Runcorn State High School Assessment Planner</h1>
+      <p id="subHeading">
+        Plan your assessment tasks using WICOR strategies, Canva organisers, and AI support.
+      </p>
+    </header>
+
+    <div class="master-control">
+      <label for="planSelector">Select an option:</label>
+      <select id="planSelector" onchange="handlePlanSelection()">
+        <option value="new_plan">➕ Start a New Plan</option>
+        <optgroup label="Saved Plans" id="savedPlansGroup">
+        </optgroup>
+      </select>
+
+      <div class="tab-bar">
+        <button type="button" id="tabAssessment" class="tab-button active" onclick="switchMode('assessment')">
+          Assessment Planner
+        </button>
+        <button type="button" id="tabWriting" class="tab-button" onclick="switchMode('writing')">
+          Writing Routines
+        </button>
+      </div>
+    </div>
+
+    <section class="form-section">
+      <h2 id="formHeading">1. Task Details</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="subjectSelect" id="subjectLabel">Faculty</label>
+          <select id="subjectSelect" onchange="handleSubjectChange()">
+            <option value="create_new">-- Create New Faculty --</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="newSubjectGroup" style="display:none;">
+          <label for="newSubject" id="newSubjectLabel">Enter New Faculty Name</label>
+          <input type="text" id="newSubject" placeholder="e.g. Technologies">
+        </div>
+
+        <div class="form-group">
+          <label for="taskName" id="taskNameLabel">Task Name</label>
+          <input type="text" id="taskName" placeholder="e.g. Investigation Task on Energy Transfers">
+        </div>
+
+        <div class="form-group" id="assessmentTypeGroup">
+          <label for="assessmentType">Assessment Type</label>
+          <select id="assessmentType" onchange="updateAssessmentDescriptions()">
+            <optgroup label="Years 7–10">
+              <option value="y7_project_assignment">Project / Assignment</option>
+              <option value="y7_exam_test">Exam / Test</option>
+              <option value="y7_practical_performance">Practical Performance</option>
+              <option value="y7_investigation_research">Investigation / Research Task</option>
+              <option value="y7_multimodal_presentation">Multimodal Presentation</option>
+              <option value="y7_folio">Folio</option>
+              <option value="y7_practical_experimental_report">Practical or Experimental Report</option>
+            </optgroup>
+            <optgroup label="Years 11–12 (General)">
+              <option value="g_ia1_extended_investigation">IA1 (Extended Response / Investigation)</option>
+              <option value="g_ia2_practical_project_analysis">IA2 (Practical Performance / Project / Analysis)</option>
+              <option value="g_ia3_extended_practical_project">IA3 (Extended Response / Practical / Project)</option>
+              <option value="g_external_exam">External Assessment (Exam)</option>
+            </optgroup>
+            <optgroup label="Years 11–12 (Applied)">
+              <option value="a_project">Project</option>
+              <option value="a_practical_performance">Practical Performance</option>
+              <option value="a_extended_response">Extended Response</option>
+              <option value="a_examination">Examination</option>
+            </optgroup>
+            <optgroup label="Short Courses">
+              <option value="short_collection_evidence">Collection of Evidence</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="startDate">Hand out date</label>
+          <input type="date" id="startDate">
+        </div>
+
+        <div class="form-group">
+          <label for="cp1Date">Checkpoint 1 (Questioning)</label>
+          <input type="date" id="cp1Date">
+        </div>
+
+        <div class="form-group">
+          <label for="cp2Date">Checkpoint 2 (Draft)</label>
+          <input type="date" id="cp2Date">
+        </div>
+
+        <div class="form-group">
+          <label for="dueDate">Due date</label>
+          <input type="date" id="dueDate">
+        </div>
+      </div>
+      <p class="hint">
+        <strong>Note:</strong> Changes are saved to this browser automatically (per tab). Use the "Download HTML" button
+        to save a backup to your computer's Downloads folder.
+      </p>
+
+      <div class="buttons hide-on-print">
+        <button type="button" class="btn-primary" onclick="generatePlan()">
+          Generate / Save Plan
+        </button>
+        <button type="button" class="btn-download" id="downloadBtn" onclick="downloadPlan()" style="display:none;">
+          Download HTML (Backup)
+        </button>
+        <button type="button" class="btn-secondary" onclick="window.print()">
+          Print Plan
+        </button>
+      </div>
+
+      <div id="errorBox" class="error" aria-live="polite"></div>
+    </section>
+
+    <section class="results-section">
+      <div class="results-header">
+        <h2 id="stepsHeading">2. Assessment Steps</h2>
+        <div class="task-label" id="taskLabel"></div>
+      </div>
+
+      <p class="no-plan" id="noPlanMessage">
+        Enter details and click "Generate / Save Plan" to begin.
+      </p>
+
+      <div class="steps-list" id="stepsGrid"></div>
+    </section>
+  </div>
+
+  <script>
+    const MODES = {
+      ASSESSMENT: 'assessment',
+      WRITING: 'writing'
+    };
+
+    let currentMode = MODES.ASSESSMENT;
+
+    const CP1_PERCENT = 25;
+    const CP2_PERCENT = 65;
+    const DRAFT_PERCENT = 80;
+
+    const STORAGE_CONFIG = {
+      assessment: {
+        PLANS: 'rshsAssessmentPlans_v1',
+        SUBJECTS: 'rshsFaculties_v1',
+        defaultSubjects: [
+          'English',
+          'Humanities & Social Sciences',
+          'Science',
+          'Mathematics',
+          'Technologies',
+          'Health & Physical Education',
+          'The Arts',
+          'Languages'
+        ]
+      },
+      writing: {
+        PLANS: 'rshsWritingPlans_v1',
+        SUBJECTS: 'rshsSubjects_v1',
+        defaultSubjects: ['English', 'History']
+      }
+    };
+
+    let pastPlans = [];
+    let subjects = [];
+    let currentFileName = 'rshs_planner.html';
+
+    const WRITING_STEPS_AVID = [
+      {
+        id: "Purpose",
+        title: "Purpose",
+        tool: "Why am I writing this piece?",
+        percent: 0,
+        description: [
+          "Deconstruct the task: highlight verbs, audience, purpose, and key topic words.",
+          "Use the summary area of your notes to restate the task in your own words.",
+          "Check the task sheet and marking guide so you know how you will be assessed."
+        ],
+        resources: [
+          { name: "Cornell Notes", url: "WritingOrganisers.html?tool=cornell" }
+        ],
+        aiPrompt: "Act as a teacher. I will paste my assignment task below. Please identify the key verbs (what I need to do), the specific content topics, and the constraints (word count/format). Then rewrite the task in simple dot points. Task: [PASTE TASK HERE]"
+      },
+      {
+        id: "questioning",
+        title: "Questioning",
+        tool: "Answer relevant guide questions",
+        percent: 25,
+        description: [
+          "List questions you need to answer to complete the task successfully.",
+          "Identify what you already know and what you need to research further.",
+          "Use a graphic organiser to sort your questions into logical groups."
+        ],
+        resources: [
+          { name: "KWL Chart", url: "WritingOrganisers.html?tool=kwl" },
+          { name: "Mind Map", url: "WritingOrganisers.html?tool=mindmap" }
+        ],
+        aiPrompt: "I am writing an assignment on [TOPIC]. Help me generate a set of focusing questions I should answer, grouped into 3–4 main sections that will later become my paragraphs."
+      },
+      {
+        id: "gathering",
+        title: "Gathering Information",
+        tool: "Generate questions/ideas/solutions, collect facts, examples and information",
+        percent: 45,
+        description: [
+          "Use textbooks, class notes, and reliable websites to answer your key questions.",
+          "Record key quotes, evidence and examples using a consistent note-taking format.",
+          "Highlight or code notes so you can quickly see which paragraph they will support."
+        ],
+        resources: [
+          { name: "Research Notes (Cornell)", url: "WritingOrganisers.html?tool=cornell" }
+        ],
+        aiPrompt: "I am researching [TOPIC]. Suggest 5–7 key points or facts I should include and explain each one in student-friendly language."
+      },
+      {
+        id: "organising",
+        title: "Organising Ideas",
+        tool: "Sort answers/idea/solutions/facts/examples into usable notes",
+        percent: 65,
+        description: [
+          "Group your notes into clear sections that match the task and criteria.",
+          "Create a paragraph plan or storyboard showing the order of your ideas.",
+          "Check that each section links back to the task and your overall argument or focus."
+        ],
+        resources: [
+          { name: "Venn Diagram", url: "WritingOrganisers.html?tool=venn" },
+          { name: "Y-Chart (Ideas)", url: "WritingOrganisers.html?tool=ychart" }
+        ],
+        aiPrompt: "I have notes on [TOPIC]. Help me organise them into a logical structure for my assignment: suggest an introduction, 3–4 body paragraphs with dot points, and a conclusion."
+      },
+      {
+        id: "draft",
+        title: "Drafting",
+        tool: "Turn notes into correct structures for the genre",
+        percent: 80,
+        description: [
+          "Turn your paragraph plan into full sentences and paragraphs.",
+          "Use topic sentences, supporting evidence, and linking sentences in each paragraph.",
+          "Write without over-editing so you can finish a complete draft on time."
+        ],
+        resources: [
+          { name: "Hamburger Paragraph", url: "WritingOrganisers.html?tool=hamburger" },
+          { name: "TEEL (English)", url: "WritingOrganisers.html?tool=teel_english" },
+          { name: "TEEEL (HASS)", url: "WritingOrganisers.html?tool=teel_hass" }
+        ],
+        aiPrompt: "Using Australian English, help me turn these dot points into a clear paragraph suitable for a school assignment. Keep my meaning but improve the flow. Notes: [PASTE NOTES HERE]"
+      },
+      {
+        id: "revise",
+        title: "Revising",
+        tool: "Refine clarity, grammar, transitions and flow",
+        percent: 90,
+        description: [
+          "Read your draft aloud or use text-to-speech to check clarity.",
+          "Improve linking words, paragraph order and any sentences that sound awkward.",
+          "Ask a peer, teacher or AI tutor for feedback on your overall structure and argument."
+        ],
+        resources: [
+          { name: "Revision (Writing Organiser)", url: "WritingOrganisers.html" }
+        ],
+        aiPrompt: "Please give feedback on the structure and clarity of this draft paragraph using Australian English conventions. Suggest improvements but keep my original ideas. Paragraph: [PASTE PARAGRAPH]"
+      },
+      {
+        id: "polish",
+        title: "Polishing",
+        tool: "Complete piece using all editing tips and with reference to marking guide",
+        percent: 5,
+        description: [
+          "Check spelling, punctuation and grammar carefully (Australian English).",
+          "Check formatting, font, spacing and headings match school or subject expectations.",
+          "Use the marking guide to tick off each requirement before submitting."
+        ],
+        resources: [
+          { name: "Checklist (Cornell Summary)", url: "WritingOrganisers.html?tool=cornell" }
+        ],
+        aiPrompt: "Act as a copy editor using Australian English. Check the text below for spelling, punctuation and basic grammar errors. Do not change my meaning. Text: [PASTE TEXT HERE]"
+      },
+      {
+        id: "Publish",
+        title: "Publishing",
+        tool: "Present writing to an audience",
+        percent: 5,
+        description: [
+          "Prepare your final version for upload, printing or presentation.",
+          "Check file name, file type and submission instructions (for example: QLearn, email, hard copy).",
+          "Record a short reflection on what worked well and what you would improve next time."
+        ],
+        resources: [
+          { name: "Reflection (Y-Chart)", url: "WritingOrganisers.html?tool=ychart" }
+        ],
+        aiPrompt: "Help me write a short reflection (3–4 sentences) on how I went with this assignment. Ask me 3 quick questions about what I found easy, hard and what I would change next time, then write the reflection from my answers."
+      }
+    ];
+
+    const BASE_WRITING_STEPS = [
+      {
+        id: "Purpose",
+        title: "Purpose",
+        tool: "Why am I writing this piece?",
+        percent: 10,
+        description: [
+          "Deconstruct the task: highlight verbs, audience, purpose, and key topic words.",
+          "Use the summary area of your notes to restate the task in your own words.",
+          "Check the task sheet and marking guide so you know how you will be assessed."
+        ],
+        resources: [
+          { name: "Cornell Notes", url: "WritingOrganisers.html?tool=cornell" }
+        ],
+        aiPrompt: "Act as a teacher. I will paste my assessment task below. Please identify the key verbs (what I need to do), the specific content topics, and the constraints (word count/format/mode). Then rewrite the task in simple dot points. Task: [PASTE TASK HERE]"
+      },
+      {
+        id: "questioning",
+        title: "Questioning",
+        tool: "Answer relevant guide questions",
+        percent: 25,
+        description: [
+          "List questions you need to answer to complete the task successfully.",
+          "Identify what you already know and what you need to research or practise further.",
+          "Use a graphic organiser to sort your questions into logical groups or sections."
+        ],
+        resources: [
+          { name: "KWL Chart", url: "WritingOrganisers.html?tool=kwl" },
+          { name: "Mind Map", url: "WritingOrganisers.html?tool=mindmap" }
+        ],
+        aiPrompt: "I am working on an assessment task on [TOPIC]. Help me generate a set of focusing questions I should answer, grouped into 3–4 main sections that will later become my paragraphs, sections or performance parts."
+      },
+      {
+        id: "gathering",
+        title: "Gathering Information",
+        tool: "Generate ideas/solutions, collect facts, examples and information",
+        percent: 45,
+        description: [
+          "Use textbooks, class notes, and reliable websites to answer your key questions.",
+          "Record key quotes, evidence, examples and data using a consistent note-taking format.",
+          "Highlight or code notes so you can quickly see which section or criterion they support."
+        ],
+        resources: [
+          { name: "Research Notes (Cornell)", url: "WritingOrganisers.html?tool=cornell" }
+        ],
+        aiPrompt: "I am researching [TOPIC] for a school assessment. Suggest 5–7 key points or facts I should include and explain each one in student-friendly language."
+      },
+      {
+        id: "organising",
+        title: "Organising Ideas",
+        tool: "Sort answers/ideas/solutions into usable notes",
+        percent: 65,
+        description: [
+          "Group your notes or practice steps into clear sections that match the task and criteria.",
+          "Create a paragraph plan, storyboard, script or procedure showing the order of your ideas or actions.",
+          "Check that each section links back to the task, stimulus and marking guide."
+        ],
+        resources: [
+          { name: "Structure Planner (Flow)", url: "WritingOrganisers.html?tool=flow" },
+          { name: "Venn Diagram", url: "WritingOrganisers.html?tool=venn" }
+        ],
+        aiPrompt: "I have notes on [TOPIC]. Help me organise them into a logical structure for my assessment: suggest an introduction/opening, 3–4 main sections with dot points, and a conclusion or final reflection."
+      },
+      {
+        id: "draft",
+        title: "Drafting / First Attempt",
+        tool: "Turn notes/plans into a full response, product or performance",
+        percent: 80,
+        description: [
+          "Use your plan to create a full first draft, product, folio piece or rehearsal run-through.",
+          "Include all required required sections, features, techniques or skills listed on the task sheet.",
+          "Focus on getting everything done rather than perfecting every detail."
+        ],
+        resources: [
+          { name: "Hamburger Paragraph", url: "WritingOrganisers.html?tool=hamburger" },
+          { name: "TEEL (English)", url: "WritingOrganisers.html?tool=teel_english" },
+          { name: "TEEEL (HASS)", url: "WritingOrganisers.html?tool=teel_hass" }
+        ],
+        aiPrompt: "Using Australian English, help me turn these dot points into a clear section suitable for my assessment. Keep my meaning but improve the flow. Notes: [PASTE NOTES HERE]"
+      },
+      {
+        id: "revise",
+        title: "Revising",
+        tool: "Refine clarity, technique, structure and flow",
+        percent: 90,
+        description: [
+          "Review your draft or performance against the marking guide and criteria.",
+          "Improve linking words, sequencing, visual/audio choices or practical technique.",
+          "Ask a peer, teacher or AI tutor for feedback on what to improve next."
+        ],
+        resources: [
+          { name: "Revision (Writing Organiser)", url: "WritingOrganisers.html" }
+        ],
+        aiPrompt: "Please give feedback on the structure and clarity of this draft response using Australian English conventions. Suggest improvements but keep my original ideas. Draft: [PASTE DRAFT HERE]"
+      },
+      {
+        id: "polish",
+        title: "Polishing",
+        tool: "Complete piece using editing tips and marking guide",
+        percent: 90,
+        description: [
+          "Check spelling, punctuation and grammar carefully (Australian English) where relevant.",
+          "Check formatting, timing, transitions, visuals and any technical requirements.",
+          "Use the marking guide to tick off each requirement before submitting or performing."
+        ],
+        resources: [
+          { name: "Checklist (Cornell Summary)", url: "WritingOrganisers.html?tool=cornell" }
+        ],
+        aiPrompt: "Act as a copy editor using Australian English. Check the text below for spelling, punctuation and basic grammar errors. Do not change my meaning. Text: [PASTE TEXT HERE]"
+      },
+      {
+        id: "Publish",
+        title: "Submission / Presentation",
+        tool: "Present or submit work to an audience",
+        percent: 100,
+        description: [
+          "Prepare your final version for upload, performance, panel, or teacher submission.",
+          "Check file name, file type and submission instructions (for example: QLearn, email, hard copy, in-class performance).",
+          "Record a short reflection on what worked well and what you would improve next time."
+        ],
+        resources: [
+          { name: "Reflection (Y-Chart)", url: "WritingOrganisers.html?tool=ychart" }
+        ],
+        aiPrompt: "Help me write a short reflection (3–4 sentences) on how I went with this assessment. Ask me 3 quick questions about what I found easy, hard and what I would change next time, then write the reflection from my answers."
+      }
+    ];
+
+    const TYPE_CATEGORY = {
+      "y7_project_assignment": "project",
+      "y7_exam_test": "exam",
+      "y7_practical_performance": "practical",
+      "y7_investigation_research": "investigation",
+      "y7_multimodal_presentation": "multimodal",
+      "y7_folio": "folio",
+      "y7_practical_experimental_report": "report",
+      "g_ia1_extended_investigation": "extended",
+      "g_ia2_practical_project_analysis": "project_practical",
+      "g_ia3_extended_practical_project": "extended_project_practical",
+      "g_external_exam": "exam",
+      "a_project": "project",
+      "a_practical_performance": "practical",
+      "a_extended_response": "extended",
+      "a_examination": "exam",
+      "short_collection_evidence": "collection"
+    };
+
+    function getPurposeConfigForCategory(category) {
+      switch (category) {
+        case "exam":
+          return {
+            tool: "Why am I completing this exam or test? What knowledge and skills do I need to demonstrate under timed conditions?",
+            description: [
+              "Unpack the exam format: sections, question types and available marks.",
+              "Highlight the key concepts, formulas or skills that will be assessed.",
+              "Plan your revision focus based on areas of strength and weakness."
+            ]
+          };
+        case "practical":
+        case "project_practical":
+          return {
+            tool: "Why am I completing this practical performance? What skills, techniques or processes am I demonstrating safely and accurately?",
+            description: [
+              "Identify the specific practical skills or techniques being assessed.",
+              "Clarify safety requirements, equipment needed and performance conditions.",
+              "Connect each practical action or technique to the marking guide criteria."
+            ]
+          };
+        case "project":
+        case "extended_project_practical":
+          return {
+            tool: "What is the purpose of this project? What product, solution or response must I create for my client or audience?",
+            description: [
+              "Clarify the client, audience and context described in the task sheet.",
+              "Highlight the required product, solution or design outcome.",
+              "Identify the main constraints (time, materials, word length, format)."
+            ]
+          };
+        case "investigation":
+          return {
+            tool: "Why am I completing this investigation or research task? What question, hypothesis or issue am I exploring?",
+            description: [
+              "Identify the research question, hypothesis or focus statement.",
+              "Highlight any required data collection methods or analytical approaches.",
+              "Clarify links between the investigation focus and the subject criteria."
+            ]
+          };
+        case "multimodal":
+          return {
+            tool: "Why am I delivering this multimodal presentation? What message or argument must I communicate to my audience?",
+            description: [
+              "Clarify the topic, audience and purpose for your presentation.",
+              "Identify required modes (spoken, visual, written) and time limits.",
+              "Highlight key ideas or arguments that must be communicated clearly."
+            ]
+          };
+        case "folio":
+          return {
+            tool: "What is the purpose of this folio? How do the pieces work together to show my best learning and skills?",
+            description: [
+              "Identify how many pieces are required and what each must show.",
+              "Highlight the range of techniques, styles or skills expected in the folio.",
+              "Clarify how each piece will be judged against the criteria."
+            ]
+          };
+        case "report":
+          return {
+            tool: "Why am I writing this practical or experimental report? What investigation or procedure am I communicating?",
+            description: [
+              "Identify the aim, variables and overall purpose of the experiment or procedure.",
+              "Highlight the sections required in the report (for example: introduction, method, results, discussion, conclusion).",
+              "Clarify the level of scientific or technical detail expected for your year level."
+            ]
+          };
+        case "extended":
+          return {
+            tool: "Why am I writing this extended response? What position, interpretation or conclusion must I develop?",
+            description: [
+              "Identify the key question, issue or stimulus the extended response must address.",
+              "Highlight the required genre (for example: essay, analytical response, persuasive speech).",
+              "Clarify expectations for depth of evidence, referencing and academic tone."
+            ]
+          };
+        case "collection":
+          return {
+            tool: "What is the purpose of this collection of evidence? What skills, knowledge and behaviours must my work samples demonstrate?",
+            description: [
+              "Identify which criteria or learning goals the collection of evidence must show.",
+              "List the types of evidence that can be included (for example: work samples, photos, checklists, reflections).",
+              "Clarify how each piece of evidence links to a specific criterion."
+            ]
+          };
+        default:
+          return {
+            tool: BASE_WRITING_STEPS[0].tool,
+            description: BASE_WRITING_STEPS[0].description
+          };
+      }
+    }
+
+    function getStepsForAssessmentType(assessmentType) {
+      const category = TYPE_CATEGORY[assessmentType] || null;
+      const steps = JSON.parse(JSON.stringify(BASE_WRITING_STEPS));
+
+      if (category) {
+        const purposeConfig = getPurposeConfigForCategory(category);
+        steps[0].tool = purposeConfig.tool;
+        steps[0].description = purposeConfig.description;
+      }
+
+      return steps;
+    }
+
+    function updateAssessmentDescriptions() {
+      // steps refresh on Generate / Save
+    }
+
+    function formatDate(dateObj, short = false) {
+      if (!(dateObj instanceof Date) || isNaN(dateObj)) return '';
+      if (short) {
+        return dateObj.toLocaleDateString('en-AU', { day: "numeric", month: "short" }).toUpperCase();
+      }
+      const options = { weekday: "short", day: "numeric", month: "short" };
+      return dateObj.toLocaleDateString('en-AU', options);
+    }
+
+    function toInputDate(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const da = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${da}`;
+    }
+
+    function parseInputDate(value) {
+      if (!value) return null;
+      const [year, month, day] = value.split("-").map(Number);
+      if (!year || !month || !day) return null;
+      return new Date(year, month - 1, day);
+    }
+
+    function createPlanId(subject, date) {
+      const monthDay = formatDate(date, true).replace(' ', '');
+      const subjectAbbrev = subject.substring(0, 4).toUpperCase();
+      return `${subjectAbbrev}${monthDay}`;
+    }
+
+    function showError(message) {
+      const errorBox = document.getElementById('errorBox');
+      errorBox.textContent = message || '';
+      errorBox.style.display = message ? 'block' : 'none';
+    }
+
+    function loadDataForCurrentMode() {
+      const cfg = STORAGE_CONFIG[currentMode];
+      const storedPlans = localStorage.getItem(cfg.PLANS);
+      pastPlans = storedPlans ? JSON.parse(storedPlans) : [];
+
+      const storedSubjects = localStorage.getItem(cfg.SUBJECTS);
+      subjects = storedSubjects ? JSON.parse(storedSubjects) : cfg.defaultSubjects.slice();
+
+      refreshUI();
+
+      const selector = document.getElementById('planSelector');
+      if (selector) {
+        selector.value = 'new_plan';
+      }
+      handlePlanSelection();
+    }
+
+    function refreshUI() {
+      const subjSelect = document.getElementById('subjectSelect');
+      const currentSubj = subjSelect.value;
+      subjSelect.innerHTML = '';
+
+      subjects.forEach(sub => {
+        const option = document.createElement('option');
+        option.value = sub;
+        option.textContent = sub;
+        subjSelect.appendChild(option);
+      });
+
+      const createOpt = document.createElement('option');
+      createOpt.value = 'create_new';
+      createOpt.textContent = currentMode === MODES.ASSESSMENT
+        ? '➕ -- Create New Faculty --'
+        : '➕ -- Create New Subject --';
+      subjSelect.appendChild(createOpt);
+
+      if (subjects.includes(currentSubj)) {
+        subjSelect.value = currentSubj;
+      } else if (subjects.length > 0) {
+        subjSelect.value = subjects[0];
+      }
+
+      const planGroup = document.getElementById('savedPlansGroup');
+      planGroup.innerHTML = '';
+      pastPlans.forEach((plan, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = `${plan.name} (${plan.subject}) - ${plan.id}`;
+        planGroup.appendChild(option);
+      });
+    }
+
+    function switchMode(mode) {
+      if (mode === currentMode) return;
+
+      currentMode = mode;
+
+      const heading = document.getElementById('mainHeading');
+      const subHeading = document.getElementById('subHeading');
+      const subjectLabel = document.getElementById('subjectLabel');
+      const newSubjectLabel = document.getElementById('newSubjectLabel');
+      const taskNameLabel = document.getElementById('taskNameLabel');
+      const taskNameInput = document.getElementById('taskName');
+      const stepsHeading = document.getElementById('stepsHeading');
+      const assessmentTypeGroup = document.getElementById('assessmentTypeGroup');
+      const downloadBtn = document.getElementById('downloadBtn');
+
+      showError('');
+      downloadBtn.style.display = 'none';
+
+      if (currentMode === MODES.ASSESSMENT) {
+        heading.textContent = 'Runcorn State High School Assessment Planner';
+        subHeading.textContent = 'Plan your assessment tasks using WICOR strategies, Canva organisers, and AI support.';
+        subjectLabel.textContent = 'Faculty';
+        newSubjectLabel.textContent = 'Enter New Faculty Name';
+        taskNameLabel.textContent = 'Task Name';
+        taskNameInput.placeholder = 'e.g. Investigation Task on Energy Transfers';
+        stepsHeading.textContent = '2. Assessment Steps';
+        assessmentTypeGroup.style.display = 'block';
+        currentFileName = 'rshs_assessment_planner.html';
+
+        document.getElementById('tabAssessment').classList.add('active');
+        document.getElementById('tabWriting').classList.remove('active');
+      } else {
+        heading.textContent = 'Runcorn State High School Writing Routines Planner';
+        subHeading.textContent = 'Plan your writing tasks using WICOR strategies, Canva organisers, and AI support.';
+        subjectLabel.textContent = 'Subject';
+        newSubjectLabel.textContent = 'Enter New Subject Name';
+        taskNameLabel.textContent = 'Writing Task Name';
+        taskNameInput.placeholder = 'e.g. Persuasive Essay on Social Media';
+        stepsHeading.textContent = '2. Writing Steps';
+        assessmentTypeGroup.style.display = 'none';
+        currentFileName = 'rshs_writing_routines_planner.html';
+
+        document.getElementById('tabAssessment').classList.remove('active');
+        document.getElementById('tabWriting').classList.add('active');
+      }
+
+      loadDataForCurrentMode();
+    }
+
+    function handleSubjectChange() {
+      const select = document.getElementById('subjectSelect');
+      const newGroup = document.getElementById('newSubjectGroup');
+      if (select.value === 'create_new') {
+        newGroup.style.display = 'block';
+        document.getElementById('newSubject').focus();
+      } else {
+        newGroup.style.display = 'none';
+      }
+    }
+
+    function handlePlanSelection() {
+      const selector = document.getElementById('planSelector');
+      const val = selector.value;
+      const grid = document.getElementById('stepsGrid');
+      const noPlanMsg = document.getElementById('noPlanMessage');
+      const downBtn = document.getElementById('downloadBtn');
+
+      if (val === 'new_plan') {
+        const subjSelect = document.getElementById('subjectSelect');
+        if (subjects.length > 0) {
+          subjSelect.value = subjects[0];
+        }
+        document.getElementById('newSubjectGroup').style.display = 'none';
+        document.getElementById('newSubject').value = '';
+        document.getElementById('taskName').value = '';
+        document.getElementById('startDate').value = '';
+        document.getElementById('cp1Date').value = '';
+        document.getElementById('cp2Date').value = '';
+        document.getElementById('dueDate').value = '';
+
+        if (currentMode === MODES.ASSESSMENT) {
+          document.getElementById('assessmentType').selectedIndex = 0;
+        }
+
+        showError('');
+        grid.innerHTML = '';
+        noPlanMsg.style.display = 'block';
+        downBtn.style.display = 'none';
+        document.getElementById('taskLabel').textContent = '';
+      } else {
+        const planIndex = parseInt(val, 10);
+        const plan = pastPlans[planIndex];
+        if (!plan) return;
+
+        if (!subjects.includes(plan.subject)) {
+          subjects.push(plan.subject);
+          subjects.sort();
+          const cfg = STORAGE_CONFIG[currentMode];
+          localStorage.setItem(cfg.SUBJECTS, JSON.stringify(subjects));
+          refreshUI();
+        }
+
+        document.getElementById('subjectSelect').value = plan.subject;
+        handleSubjectChange();
+        document.getElementById('taskName').value = plan.name;
+        document.getElementById('startDate').value = plan.startDateStr || '';
+        document.getElementById('dueDate').value = plan.dueDateStr || '';
+        document.getElementById('cp1Date').value = plan.cp1DateStr || '';
+        document.getElementById('cp2Date').value = plan.cp2DateStr || '';
+
+        if (currentMode === MODES.ASSESSMENT && plan.assessmentType) {
+          document.getElementById('assessmentType').value = plan.assessmentType;
+        }
+
+        generatePlan(false);
+        document.getElementById('downloadBtn').style.display = 'inline-flex';
+      }
+    }
+
+    function saveSubject(newSubjectName) {
+      if (newSubjectName && !subjects.includes(newSubjectName)) {
+        subjects.push(newSubjectName);
+        subjects.sort();
+        const cfg = STORAGE_CONFIG[currentMode];
+        localStorage.setItem(cfg.SUBJECTS, JSON.stringify(subjects));
+        refreshUI();
+        document.getElementById('subjectSelect').value = newSubjectName;
+        handleSubjectChange();
+      }
+    }
+
+    function generatePlan(saveToStorage = true) {
+      const subjectSelect = document.getElementById("subjectSelect");
+      const newSubjectInput = document.getElementById("newSubject");
+      const taskNameInput = document.getElementById("taskName");
+      const startDateInput = document.getElementById("startDate");
+      const cp1DateInput = document.getElementById("cp1Date");
+      const cp2DateInput = document.getElementById("cp2Date");
+      const draftDateInput = document.getElementById("draftDate");
+      const dueDateInput = document.getElementById("dueDate");
+      const stepsGrid = document.getElementById("stepsGrid");
+      const noPlanMessage = document.getElementById("noPlanMessage");
+      const taskLabel = document.getElementById("taskLabel");
+      const downloadBtn = document.getElementById("downloadBtn");
+
+      showError('');
+      stepsGrid.innerHTML = "";
+      noPlanMessage.style.display = "none";
+      taskLabel.textContent = "";
+      downloadBtn.style.display = "none";
+
+      let subject = subjectSelect.value;
+      if (subject === 'create_new') {
+        const manualSubj = newSubjectInput.value.trim();
+        if (!manualSubj) {
+          showError(currentMode === MODES.ASSESSMENT
+            ? "Please enter a name for the new faculty."
+            : "Please enter a name for the new subject.");
+          noPlanMessage.style.display = "block";
+          return;
+        }
+        if (saveToStorage) {
+          saveSubject(manualSubj);
+          subject = manualSubj;
+        } else {
+          subject = manualSubj;
+        }
+      }
+
+      const taskName = taskNameInput.value.trim() || (currentMode === MODES.ASSESSMENT ? "Assessment Task" : "Writing Task");
+
+      if (!subject || !taskName) {
+        showError("Please enter a Task Name and select a Faculty/Subject.");
+        noPlanMessage.style.display = "block";
+        return;
+      }
+
+      const start = parseInputDate(startDateInput.value);
+      const due = parseInputDate(dueDateInput.value);
+
+      if (!start || !due) {
+        showError("Please select both a hand out date and a due date.");
+        noPlanMessage.style.display = "block";
+        return;
+      }
+
+      if (due <= start) {
+        showError("Due date must be after the hand out date.");
+        noPlanMessage.style.display = "block";
+        return;
+      }
+
+      const cp1 = parseInputDate(cp1DateInput.value);
+      const cp2 = parseInputDate(cp2DateInput.value);
+
+      let steps;
+      let assessmentTypeValue = null;
+
+      if (currentMode === MODES.ASSESSMENT) {
+        const assessmentTypeSelect = document.getElementById('assessmentType');
+        assessmentTypeValue = assessmentTypeSelect.value;
+        steps = getStepsForAssessmentType(assessmentTypeValue);
+      } else {
+        steps = JSON.parse(JSON.stringify(WRITING_STEPS_AVID));
+      }
+
+      renderSteps(steps, start, due, cp1, cp2);
+
+      taskLabel.textContent = `${subject} • ${taskName} • ${formatDate(start)} → ${formatDate(due)}`;
+
+      if (saveToStorage) {
+        const cfg = STORAGE_CONFIG[currentMode];
+        const planId = createPlanId(subject, due);
+        const planData = {
+          id: planId,
+          name: taskName,
+          subject: subject,
+          startDateStr: startDateInput.value,
+          dueDateStr: dueDateInput.value,
+          cp1DateStr: cp1DateInput.value,
+          cp2DateStr: cp2DateInput.value
+        };
+        if (currentMode === MODES.ASSESSMENT) {
+          planData.assessmentType = assessmentTypeValue;
+        }
+
+        const existingIndex = pastPlans.findIndex(p => p.id === planId && p.subject === subject);
+        if (existingIndex >= 0) {
+          pastPlans[existingIndex] = planData;
+        } else {
+          pastPlans.push(planData);
+        }
+
+        localStorage.setItem(cfg.PLANS, JSON.stringify(pastPlans));
+        refreshUI();
+
+        const idx = pastPlans.findIndex(p => p.id === planId && p.subject === subject);
+        if (idx >= 0) {
+          const selector = document.getElementById('planSelector');
+          selector.value = String(idx);
+        }
+
+        downloadBtn.style.display = 'inline-flex';
+      }
+    }
+
+    function renderSteps(steps, start, due, cp1, cp2) {
+      const stepsGrid = document.getElementById('stepsGrid');
+      const noPlanMessage = document.getElementById('noPlanMessage');
+      stepsGrid.innerHTML = '';
+      noPlanMessage.style.display = 'none';
+
+      const totalMs = due - start;
+
+      function getTargetDate(step) {
+        if (step.id === 'Purpose' && start) return start;
+        if (step.id === 'questioning' && cp1) return cp1;
+        if ((step.id === 'organising' || step.id === 'draft') && cp2) return cp2;
+        if (step.id === 'Publish' && due) return due;
+
+        const msOffset = totalMs * (step.percent / 100);
+        return new Date(start.getTime() + msOffset);
+      }
+
+      // Group 1: steps 0–3, Group 2: 4–5, Group 3: 6–7
+      const groups = [
+        { name: "Getting Started", classExtra: "", indices: [0, 1, 2, 3] },
+        { name: "Developing & Drafting", classExtra: "step-group-middle", indices: [4, 5] },
+        { name: "Refining & Submitting", classExtra: "", indices: [6, 7] }
+      ];
+
+      groups.forEach(group => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'step-group ' + group.classExtra;
+
+        const innerList = document.createElement('div');
+        innerList.className = 'steps-list';
+
+        group.indices.forEach(i => {
+          if (i >= steps.length) return;
+          const step = steps[i];
+          const targetDate = getTargetDate(step);
+          const card = document.createElement('article');
+          card.className = 'step-card';
+
+          card.innerHTML = `
+            <div class="step-summary">
+              <div class="step-info">
+                <div class="step-title">${step.title}</div>
+                <div class="step-tool">${step.tool}</div>
+                <div class="step-dates">${formatDate(targetDate)} (${step.percent}%)</div>
+              </div>
+              <div class="percent-tag">${step.percent}%</div>
+            </div>
+            <div class="step-details">
+              <div class="detail-column">
+                <h4>What to do</h4>
+                <ul>
+                  ${(step.description || []).map(d => `<li>${d}</li>`).join('')}
+                </ul>
+                <h4>Tools</h4>
+                <ul class="tools-list">
+                  ${(step.resources || []).map(r => `
+                    <li><a href="${r.url}" target="_blank" class="resource-link">${r.name}</a></li>
+                  `).join('')}
+                </ul>
+              </div>
+              <div class="detail-column">
+                ${step.aiPrompt ? `
+                  <h4>Suggested AI prompt</h4>
+                  <div class="ai-prompt-box">
+                    <span class="ai-label">AI prompt</span>
+                    <button type="button" class="copy-prompt-btn">Copy</button>
+                    <div class="ai-prompt-text">${step.aiPrompt}</div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+
+          // Toggle expand on click
+          card.addEventListener('click', function (e) {
+            if (e.target.tagName === 'A' || e.target.closest('a')) return;
+            if (e.target.classList.contains('copy-prompt-btn')) return;
+            const details = card.querySelector('.step-details');
+            if (!details) return;
+            const isHidden = details.style.display === 'none' || details.style.display === '';
+            details.style.display = isHidden ? 'grid' : 'none';
+          });
+
+          // Hook up copy button if present
+          const promptBox = card.querySelector('.ai-prompt-box');
+          if (promptBox) {
+            const btn = promptBox.querySelector('.copy-prompt-btn');
+            const textEl = promptBox.querySelector('.ai-prompt-text');
+            if (btn && textEl) {
+              const promptText = textEl.textContent;
+              btn.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+                copyPrompt(promptText, btn);
+              });
+            }
+          }
+
+          innerList.appendChild(card);
+        });
+
+        wrapper.appendChild(innerList);
+        stepsGrid.appendChild(wrapper);
+      });
+    }
+
+    function copyPrompt(text, btn) {
+      if (!text) return;
+      const originalLabel = btn.textContent;
+      function showCopied(ok) {
+        btn.textContent = ok ? 'Copied!' : 'Error';
+        setTimeout(() => {
+          btn.textContent = originalLabel;
+        }, 1200);
+      }
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text)
+          .then(() => showCopied(true))
+          .catch(() => {
+            fallbackCopy(text);
+            showCopied(true);
+          });
+      } else {
+        const ok = fallbackCopy(text);
+        showCopied(ok);
+      }
+    }
+
+    function fallbackCopy(text) {
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        return success;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function downloadPlan() {
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = currentFileName || 'rshs_planner.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    window.addEventListener('load', () => {
+      currentMode = MODES.ASSESSMENT;
+
+      const today = new Date();
+      const inTwoWeeks = new Date();
+      inTwoWeeks.setDate(today.getDate() + 14);
+
+      document.getElementById("startDate").value = toInputDate(today);
+      document.getElementById("dueDate").value = toInputDate(inTwoWeeks);
+
+      loadDataForCurrentMode();
+    });
+  </script>
+</body>
+
+</html>

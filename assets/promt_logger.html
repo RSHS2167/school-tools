@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Log</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .project-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .project-bar label {
+            font-weight: bold;
+        }
+        #projectSelect {
+            flex: 1;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            min-width: 150px;
+        }
+        .project-bar button {
+            width: auto; /* override global button width */
+            padding: 8px 14px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 100px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .export-btn {
+            background-color: #28a745;
+            margin-top: 15px;
+        }
+        .export-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Prompt Log</h1>
+
+        <!-- Project selector and Add New Project button -->
+        <div class="project-bar">
+            <label for="projectSelect">Project:</label>
+            <select id="projectSelect"></select>
+            <button type="button" onclick="addProject()">Add New Project</button>
+        </div>
+
+        <div class="form-group">
+            <label for="prompt">Prompt:</label>
+            <textarea id="prompt" rows="4"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="outcome">AI Outcome:</label>
+            <textarea id="outcome" rows="4"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="issues">Issues / Fixes:</label>
+            <textarea id="issues" rows="4"></textarea>
+        </div>
+
+        <button onclick="addEntry()">Add Entry</button>
+
+        <h2>Log Entries</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>dateTime</th>
+                    <th>Prompt</th>
+                    <th>AI Outcome</th>
+                    <th>Issues / Fixes</th>
+                </tr>
+            </thead>
+            <tbody id="logTableBody">
+                <!-- Log entries will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+        
+        <button class="export-btn" onclick="exportToCSV()">Export to CSV (Current Project)</button>
+    </div>
+
+    <script>
+        // Reuse the same key as the original file, but now it stores projects.
+        const STORAGE_KEY = "ai_prompt_entries";
+
+        // Data structure:
+        // {
+        //   currentProjectId: "some-id",
+        //   projects: [
+        //     { id: "some-id", name: "Project 1", entries: [ {dateTime, prompt, outcome, issues}, ... ] }
+        //   ]
+        // }
+        let data = {
+            currentProjectId: null,
+            projects: []
+        };
+
+        const logTableBody = document.getElementById('logTableBody');
+        const projectSelect = document.getElementById('projectSelect');
+
+        function escapeCSV(str) {
+            if (typeof str !== 'string') return '';
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                return `"${str.replace(/"/g, '""')}"`;
+            }
+            return str;
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (err) {
+                console.error("Could not save to localStorage:", err);
+            }
+        }
+
+        function loadData() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+
+                    // If it was the old format (array of entries), migrate to a single default project.
+                    if (Array.isArray(parsed)) {
+                        data = {
+                            currentProjectId: "default",
+                            projects: [
+                                {
+                                    id: "default",
+                                    name: "Project 1",
+                                    entries: parsed
+                                }
+                            ]
+                        };
+                        saveData();
+                    } else if (parsed && parsed.projects && parsed.currentProjectId) {
+                        data = parsed;
+                    } else {
+                        // If something odd is stored, reset to a default project.
+                        initialiseDefaultData();
+                    }
+                } else {
+                    initialiseDefaultData();
+                }
+            } catch (err) {
+                console.error("Could not load from localStorage:", err);
+                initialiseDefaultData();
+            }
+
+            renderProjectOptions();
+            renderEntriesForCurrentProject();
+        }
+
+        function initialiseDefaultData() {
+            data = {
+                currentProjectId: "default",
+                projects: [
+                    { id: "default", name: "Project 1", entries: [] }
+                ]
+            };
+            saveData();
+        }
+
+        function getCurrentProject() {
+            return data.projects.find(p => p.id === data.currentProjectId) || null;
+        }
+
+        function renderProjectOptions() {
+            projectSelect.innerHTML = "";
+
+            data.projects.forEach(project => {
+                const opt = document.createElement("option");
+                opt.value = project.id;
+                opt.textContent = project.name;
+                projectSelect.appendChild(opt);
+            });
+
+            if (!data.currentProjectId && data.projects.length > 0) {
+                data.currentProjectId = data.projects[0].id;
+                saveData();
+            }
+
+            if (data.currentProjectId) {
+                projectSelect.value = data.currentProjectId;
+            }
+
+            projectSelect.onchange = function () {
+                data.currentProjectId = projectSelect.value;
+                saveData();
+                renderEntriesForCurrentProject();
+            };
+        }
+
+        function renderEntriesForCurrentProject() {
+            logTableBody.innerHTML = "";
+            const project = getCurrentProject();
+            if (!project) return;
+
+            project.entries.forEach(entry => {
+                renderEntry(entry);
+            });
+        }
+
+        function renderEntry(entry) {
+            const newRow = logTableBody.insertRow();
+            newRow.insertCell(0).textContent = entry.dateTime;
+            newRow.insertCell(1).textContent = entry.prompt;
+            newRow.insertCell(2).textContent = entry.outcome;
+            newRow.insertCell(3).textContent = entry.issues;
+        }
+
+        function addEntry() {
+            const promptInput = document.getElementById('prompt');
+            const outcomeInput = document.getElementById('outcome');
+            const issuesInput = document.getElementById('issues');
+
+            const promptValue = promptInput.value.trim();
+            const outcomeValue = outcomeInput.value.trim();
+            const issuesValue = issuesInput.value.trim();
+
+            if (promptValue === '') {
+                alert('Prompt cannot be empty.');
+                return;
+            }
+
+            const project = getCurrentProject();
+            if (!project) {
+                alert('No project selected.');
+                return;
+            }
+
+            const now = new Date();
+            const dateTimeString = now.toLocaleString();
+
+            const newEntry = {
+                dateTime: dateTimeString,
+                prompt: promptValue,
+                outcome: outcomeValue,
+                issues: issuesValue
+            };
+
+            project.entries.push(newEntry);
+            saveData();
+            renderEntriesForCurrentProject();
+
+            promptInput.value = '';
+            outcomeInput.value = '';
+            issuesInput.value = '';
+        }
+
+        function addProject() {
+            const name = prompt("Enter a name for the new project:", `Project ${data.projects.length + 1}`);
+            if (!name || name.trim() === "") {
+                return;
+            }
+
+            const id = "proj_" + Date.now();
+            const newProject = {
+                id: id,
+                name: name.trim(),
+                entries: []
+            };
+
+            data.projects.push(newProject);
+            data.currentProjectId = id;
+            saveData();
+
+            renderProjectOptions();
+            renderEntriesForCurrentProject();
+        }
+
+        function exportToCSV() {
+            const project = getCurrentProject();
+            if (!project) {
+                alert("No project selected.");
+                return;
+            }
+
+            const entries = project.entries;
+            if (!entries || entries.length === 0) {
+                alert("No data to export for this project.");
+                return;
+            }
+
+            const headers = ["dateTime", "Prompt", "Outcome", "Issues"];
+            let csvContent = headers.map(escapeCSV).join(',') + '\n';
+
+            entries.forEach(entry => {
+                const rowData = [
+                    entry.dateTime,
+                    entry.prompt,
+                    entry.outcome,
+                    entry.issues
+                ];
+                csvContent += rowData.map(escapeCSV).join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                const safeName = project.name.replace(/[^a-z0-9_\-]+/gi, "_");
+                link.setAttribute("download", `ai_log_${safeName}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } else {
+                alert("Your browser does not support automatic downloads.");
+            }
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>

@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reading Routines Timer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #6ea2dc;
+            /* light blue */
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* LEFT SIDEBAR */
+        .sidebar {
+            width: 170px;
+            background-color: #1d2755;
+            padding: 18px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.25);
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .step-wrapper {
+            text-align: center;
+        }
+
+        /* ICON BACKING BOX (light blue background ONLY) */
+        .step-box {
+            background-color: #7fb2ef;
+            /* light blue */
+            border-radius: 18px;
+            padding: 6px;
+        }
+
+        /* ICON */
+        .step-icon {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 3px solid transparent;
+            /* default: transparent */
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: radial-gradient(circle at 30% 20%, #36447e, #141c3f);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .step-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* GOLD OUTLINE ONLY WHEN ACTIVE */
+        .step-icon.active {
+            border-color: #f4c542;
+            box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.75);
+        }
+
+        .step-label {
+            margin-top: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #f4c542;
+        }
+
+        /* MAIN AREA */
+        .main {
+            flex: 1;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-button {
+            cursor: pointer;
+            font-size: 26px;
+            padding: 6px 10px;
+            background-color: rgba(0, 0, 0, 0.22);
+            border-radius: 50%;
+        }
+
+        .import-button {
+            background: #f4c542;
+            color: #1d2755;
+            border: none;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 1;
+        }
+
+        .timer-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            /* more balanced */
+            margin-top: 10px;
+        }
+
+        /* Centres timer row when responder hidden */
+        .timer-row.centered {
+            justify-content: center !important;
+        }
+
+        /* TIMER – larger */
+        .timer-container {
+            position: relative;
+            width: 520px;
+            height: 520px;
+        }
+
+        .timer-svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            transform: translate(-50%, -50%) rotate(-90deg);
+            z-index: 3;
+            /* bring yellow ring to front */
+        }
+
+        .timer-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.15);
+            stroke-width: 20;
+        }
+
+        .timer-progress {
+            fill: none;
+            stroke: #f4c542;
+            stroke-width: 20;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.25s linear;
+        }
+
+        /* DARKENED INNER CIRCLE – larger to fill more space */
+        .timer-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 420px;
+            height: 420px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.35);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            /* behind the ring */
+        }
+
+        .timer-inner img {
+            width: 100%;
+            height: 100%;
+            opacity: 0.20;
+            object-fit: contain;
+            transform: translateY(-16px);
+            /* move image upwards */
+        }
+
+        .timer-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .step-name {
+            font-size: 40px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .time-remaining {
+            font-size: 100px;
+            font-weight: bold;
+        }
+
+        /* RESPONDER BOX – larger */
+        .responder-box {
+            width: 340px;
+            background-color: #f4c542;
+            color: #1d2755;
+            border-radius: 16px;
+            padding: 18px 18px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .responder-title {
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .responder-name {
+            font-size: 24px;
+            font-weight: bold;
+            min-height: 32px;
+            word-wrap: break-word;
+        }
+
+        .responder-status {
+            font-size: 14px;
+            min-height: 20px;
+        }
+
+        .responder-roll-btn {
+            align-self: flex-end;
+            margin-top: 8px;
+            background: #1d2755;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .responder-roll-btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        /* EXPANDED DESCRIPTION – wider and larger */
+        .description {
+            max-width: 1050px;
+            background-color: rgba(15, 25, 60, 0.8);
+            padding: 20px 26px;
+            text-align: center;
+            border-radius: 12px;
+            margin-top: 24px;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        /* CONTROLS (same size as before) */
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .control-button {
+            background: #1d2755;
+            border: none;
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .auto-toggle {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(15, 25, 60, 0.8);
+            padding: 4px 8px;
+            border-radius: 16px;
+            font-size: 13px;
+        }
+
+        /* SETTINGS MODAL */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(255, 255, 255, 0.92);
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 40px;
+            z-index: 80;
+        }
+
+        .modal {
+            background: white;
+            color: black;
+            padding: 16px;
+            border-radius: 12px;
+            width: 440px;
+            max-height: 70vh;
+            overflow-y: visible;
+        }
+
+        .modal table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .modal td {
+            border-bottom: 1px solid #ddd;
+            padding: 4px 6px;
+            font-size: 14px;
+        }
+
+        .modal input[type="number"] {
+            width: 70px;
+        }
+
+        .modal input[type="text"] {
+            width: 180px;
+        }
+
+        .modal-button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            margin-top: 10px;
+            margin-right: 6px;
+            font-size: 14px;
+        }
+
+        .primary {
+            background: #1d2755;
+            color: white;
+        }
+
+        .secondary {
+            background: #ddd;
+        }
+
+        .small-note {
+            font-size: 12px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        /* STUDENT IMPORT MODAL */
+        .students-modal {
+            background: white;
+            color: black;
+            padding: 16px;
+            border-radius: 12px;
+            width: 460px;
+            max-height: 75vh;
+            overflow-y: auto;
+        }
+
+        .students-modal textarea {
+            width: 100%;
+            height: 160px;
+            resize: vertical;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar" id="sidebar"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <div class="header">
+            <div>
+                <div class="title">Reading Routines Timer</div>
+                <div class="subtitle">Reading with efficiency, one step at a time</div>
+            </div>
+            <div class="header-right">
+                <button class="import-button" id="importStudentsButton">Import students</button>
+                <div class="settings-button" id="openSettings">&#9881;</div>
+            </div>
+        </div>
+
+        <div class="content">
+
+            <div class="timer-row centered">
+                <!-- TIMER -->
+                <div class="timer-container">
+                    <svg class="timer-svg" viewBox="0 0 380 380">
+                        <circle class="timer-bg" cx="190" cy="190" r="150"></circle>
+                        <circle class="timer-progress" cx="190" cy="190" r="150"></circle>
+                    </svg>
+
+                    <div class="timer-inner">
+                        <img id="mainIcon">
+                        <div class="timer-overlay">
+                            <div class="step-name" id="stepName"></div>
+                            <div class="time-remaining" id="timeRemaining">00:00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RESPONDER BOX -->
+                <div class="responder-box" id="responderBox">
+                    <div class="responder-title">Responder</div>
+                    <div class="responder-name" id="responderName">No students</div>
+                    <div class="responder-status" id="responderStatus">Import or paste a list</div>
+                    <button class="responder-roll-btn" id="rollButton" disabled>Roll</button>
+                </div>
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div class="description" id="stepDescription"></div>
+
+            <div class="controls">
+                <div class="auto-toggle">
+                    <input type="checkbox" id="autoNextToggle" checked>
+                    Auto next step
+                </div>
+
+                <button class="control-button" id="resetButton">Reset</button>
+                <button class="control-button" id="pauseButton">Pause</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO: warning = ding, end = chime -->
+    <audio id="beepWarning" src="ding.wav"></audio>
+    <audio id="beepEnd" src="chime.wav"></audio>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-backdrop" id="settingsModal">
+        <div class="modal">
+            <h2>Timer Settings</h2>
+
+            <table id="settingsTable"></table>
+
+            <br>
+
+            <!-- Warning time setting -->
+            <label>
+                Warning sound time (seconds before end):
+                <input type="number" id="warningTimeInput" min="0" value="10">
+            </label>
+            <br><br>
+
+            <label>
+                Warning sound:
+                <input type="text" id="warningSoundInput" value="ding.wav">
+            </label><br><br>
+
+            <label>
+                End sound:
+                <input type="text" id="endSoundInput" value="chime.wav">
+            </label>
+
+            <p class="small-note">
+                Put the .wav files next to this HTML file or adjust paths here.
+            </p>
+
+            <hr style="margin:10px 0;">
+
+            <button class="modal-button secondary" id="downloadSettings">Download settings JSON</button>
+            <label class="modal-button secondary" for="uploadSettingsInput" style="display:inline-block;">
+                Load settings JSON
+            </label>
+            <input type="file" id="uploadSettingsInput" accept=".json" style="display:none;">
+
+            <p class="small-note">
+                Settings also save automatically in this browser and reload next time.
+            </p>
+
+            <div style="margin-top:8px;">
+                <button class="modal-button secondary" id="closeSettings">Cancel</button>
+                <button class="modal-button primary" id="saveSettings">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STUDENTS IMPORT MODAL -->
+    <div class="modal-backdrop" id="studentsModal" style="display:none;">
+        <div class="students-modal">
+            <h2>Import students</h2>
+            <p style="font-size:13px; color:#333;">
+                Paste a list of names (one per line or comma-separated), or upload a
+                <strong>.txt</strong>, <strong>.csv</strong>, <strong>.xlsx</strong> or <strong>.xls</strong> file.
+            </p>
+            <textarea id="studentsTextarea" placeholder="e.g.&#10;Alex Smith&#10;Jamie Lee&#10;Pat Taylor"></textarea>
+            <br><br>
+            <input type="file" id="studentFileInput" accept=".txt,.csv,.xlsx,.xls"
+                style="display:block; margin-bottom:6px;">
+
+            <p class="small-note">
+                Excel spreadsheets: names are read from the first sheet (all non-empty cells).
+            </p>
+
+            <div style="margin-top:8px;">
+                <button class="modal-button secondary" id="studentsCancel">Close</button>
+                <button class="modal-button secondary" id="studentsLoadPaste">Use pasted list</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SheetJS for XLSX support -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <script>
+        /* ---------- CONSTANTS / STORAGE ---------- */
+        const STORAGE_KEY = "readingRoutinesTimerSettings_v3";
+
+        /* TIMER DATA */
+        let steps = [
+            {
+                id: "purpose", name: "1. Purpose", icon: "images/purpose.jpg", minutes: 1.5,
+                description: "Clarify why you are reading. Identify the key purpose so you know what to focus on."
+            },
+
+            {
+                id: "skimscan", name: "2. Skim & Scan", icon: "images/SkimandScan.jpg", minutes: 2,
+                description: "Scan headings, bold words, diagrams and first sentences. Highlight ideas that stand out."
+            },
+
+            {
+                id: "vocab", name: "3. Vocabulary", icon: "images/Vocabularyclarification.jpg", minutes: 2,
+                description: "Spot unfamiliar words and use clues, prefixes or examples to work out meaning."
+            },
+
+            {
+                id: "firstread", name: "4. First Read", icon: "images/firstread.jpg", minutes: 4,
+                description: "Read through the whole text once to understand the main ideas."
+            },
+
+            {
+                id: "priorknowledge", name: "5. Prior Knowledge", icon: "images/priorknolwedge.jpg", minutes: 2,
+                description: "Connect ideas to your own knowledge or previous lessons so the text makes more sense."
+            },
+
+            {
+                id: "deepread", name: "6. Deep Read", icon: "images/deepdread.jpg", minutes: 5,
+                description: "Read important sections slowly. Highlight and annotate reasons, evidence and explanations."
+            },
+
+            {
+                id: "check", name: "7. Check Understanding", icon: "images/checkunderstanding.jpg", minutes: 3,
+                description: "Check your notes and answers against the purpose. Fix gaps or confusion by rereading small parts."
+            },
+
+            {
+                id: "repeat", name: "8. Repeat", icon: "images/repeat.jpg", minutes: 2,
+                description: "Apply this routine to the next section or paragraph so you keep understanding as you go."
+            }
+        ];
+
+        let settings = {
+            stepMinutes: {},
+            warningSound: "ding.wav",
+            endSound: "chime.wav",
+            warningTime: 10,
+            autoAdvance: true
+        };
+
+        /* ELEMENTS */
+        const sidebarEl = document.getElementById("sidebar");
+        const mainIconEl = document.getElementById("mainIcon");
+        const stepNameEl = document.getElementById("stepName");
+        const timeRemainingEl = document.getElementById("timeRemaining");
+        const descriptionEl = document.getElementById("stepDescription");
+        const pauseButtonEl = document.getElementById("pauseButton");
+        const resetButtonEl = document.getElementById("resetButton");
+        const autoNextToggle = document.getElementById("autoNextToggle");
+        const beepWarningEl = document.getElementById("beepWarning");
+        const beepEndEl = document.getElementById("beepEnd");
+
+        const importStudentsButton = document.getElementById("importStudentsButton");
+        const studentsModal = document.getElementById("studentsModal");
+        const studentsTextarea = document.getElementById("studentsTextarea");
+        const studentFileInput = document.getElementById("studentFileInput");
+        const studentsCancelBtn = document.getElementById("studentsCancel");
+        const studentsLoadPasteBtn = document.getElementById("studentsLoadPaste");
+
+        const responderNameEl = document.getElementById("responderName");
+        const responderStatusEl = document.getElementById("responderStatus");
+        const rollButtonEl = document.getElementById("rollButton");
+
+        const responderBoxEl = document.getElementById("responderBox");
+        const timerRowEl = document.querySelector(".timer-row");
+
+        /* SVG progress setup */
+        const progressCircle = document.querySelector(".timer-progress");
+        const radius = 150;
+        const circumference = 2 * Math.PI * radius;
+        progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+        progressCircle.style.strokeDashoffset = circumference;
+
+        /* TIMER STATE */
+        let currentStepIndex = 0;
+        let remainingSeconds = 0;
+        let totalSeconds = 0;
+        let timerInterval = null;
+        let autoAdvance = true;
+
+        /* RESPONDER STATE */
+        let allStudents = [];
+        let remainingStudents = [];
+        let isRolling = false;
+        let rollingInterval = null;
+
+        /* AUDIO UNLOCK (browser click requirement) */
+        function unlockAudio() {
+            try { beepWarningEl.play().then(() => { beepWarningEl.pause(); beepWarningEl.currentTime = 0; }); } catch { }
+            try { beepEndEl.play().then(() => { beepEndEl.pause(); beepEndEl.currentTime = 0; }); } catch { }
+            document.removeEventListener("click", unlockAudio);
+        }
+        document.addEventListener("click", unlockAudio);
+
+        /* ---- SETTINGS LOAD/SAVE ---- */
+        function loadSettings() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try {
+                    const saved = JSON.parse(raw);
+                    Object.assign(settings, saved || {});
+                } catch (e) {
+                    console.warn("Could not parse saved settings", e);
+                }
+            }
+
+            steps.forEach(step => {
+                const mins = settings.stepMinutes[step.id];
+                if (typeof mins === "number" && mins > 0) {
+                    step.minutes = mins;
+                }
+            });
+
+            beepWarningEl.src = settings.warningSound || "ding.wav";
+            beepEndEl.src = settings.endSound || "chime.wav";
+
+            if (typeof settings.warningTime !== "number" || settings.warningTime < 0) {
+                settings.warningTime = 10;
+            }
+
+            autoAdvance = settings.autoAdvance !== false;
+            autoNextToggle.checked = autoAdvance;
+        }
+
+        function saveSettings() {
+            const stepMinutes = {};
+            steps.forEach(step => {
+                stepMinutes[step.id] = step.minutes;
+            });
+
+            settings.stepMinutes = stepMinutes;
+            settings.warningSound = beepWarningEl.src.split("/").pop() || "ding.wav";
+            settings.endSound = beepEndEl.src.split("/").pop() || "chime.wav";
+            settings.autoAdvance = autoAdvance;
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        }
+
+        /* ---- SIDEBAR BUILD ---- */
+        function buildSidebar() {
+            sidebarEl.innerHTML = "";
+
+            steps.forEach((step, i) => {
+                const wrap = document.createElement("div");
+                wrap.className = "step-wrapper";
+
+                const box = document.createElement("div");
+                box.className = "step-box";
+
+                const icon = document.createElement("div");
+                icon.className = "step-icon";
+                icon.dataset.index = i;
+
+                const img = document.createElement("img");
+                img.src = step.icon;
+                icon.appendChild(img);
+
+                box.appendChild(icon);
+                wrap.appendChild(box);
+
+                const label = document.createElement("div");
+                label.className = "step-label";
+                label.textContent = step.name;
+                wrap.appendChild(label);
+
+                icon.addEventListener("click", () => selectStep(i, true, false));
+                sidebarEl.appendChild(wrap);
+            });
+        }
+
+        /* ---- RESPONDER BOX SHOW/HIDE ---- */
+        function showResponderBox() {
+            responderBoxEl.style.display = "flex";
+            timerRowEl.classList.remove("centered");
+        }
+
+        function hideResponderBox() {
+            responderBoxEl.style.display = "none";
+            timerRowEl.classList.add("centered");
+        }
+
+        /* ---- TIMER FUNCTIONS ---- */
+        function selectStep(i, reset = true, autoStart = false) {
+            currentStepIndex = i;
+
+            document.querySelectorAll(".step-icon")
+                .forEach((el, idx) => el.classList.toggle("active", idx === i));
+
+            const step = steps[i];
+            mainIconEl.src = step.icon;
+            stepNameEl.textContent = step.name;
+            descriptionEl.textContent = step.description;
+
+            totalSeconds = Math.round(step.minutes * 60);
+            if (reset) {
+                remainingSeconds = totalSeconds;
+                updateDisplay();
+                stopTimer();
+            }
+            if (autoStart) startTimer();
+        }
+
+        function updateDisplay() {
+            const m = Math.floor(remainingSeconds / 60);
+            const s = remainingSeconds % 60;
+            timeRemainingEl.textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+
+            const progress = totalSeconds > 0 ? remainingSeconds / totalSeconds : 0;
+            progressCircle.style.strokeDashoffset = circumference - progress * circumference;
+        }
+
+        function tick() {
+            if (remainingSeconds <= 0) {
+                endStep();
+                return;
+            }
+
+            remainingSeconds--;
+            updateDisplay();
+
+            if (settings.warningTime > 0 && remainingSeconds === settings.warningTime) {
+                beepWarningEl.play().catch(() => { });
+            }
+        }
+
+        function endStep() {
+            stopTimer();
+            beepEndEl.play().catch(() => { });
+
+            if (autoAdvance && currentStepIndex < steps.length - 1) {
+                selectStep(currentStepIndex + 1, true, true);
+            }
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(tick, 1000);
+            pauseButtonEl.textContent = "Pause";
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            pauseButtonEl.textContent = "Start";
+        }
+
+        /* BUTTONS */
+        pauseButtonEl.onclick = () => timerInterval ? stopTimer() : startTimer();
+
+        resetButtonEl.onclick = () => {
+            remainingSeconds = totalSeconds;
+            updateDisplay();
+            stopTimer();
+        };
+
+        autoNextToggle.onchange = () => {
+            autoAdvance = autoNextToggle.checked;
+            saveSettings();
+        };
+
+        /* ---- RESPONDER FUNCTIONS ---- */
+        function formatStudentName(raw) {
+            if (!raw) return "";
+            let trimmed = raw.trim();
+
+            // Priority 1: Check for preferred name in parentheses e.g. "DOE, Jane (Janey)"
+            let preferredMatch = trimmed.match(/\(([^)]+)\)/);
+            if (preferredMatch) {
+                return preferredMatch[1].trim();
+            }
+
+            // Priority 2: Check for comma format e.g. "DOE, Jane"
+            if (trimmed.includes(",")) {
+                let parts = trimmed.split(",");
+                // The part after the comma is the first name
+                let firstNamePart = parts.slice(1).join(",").trim();
+                // Take just the first word of the first name part
+                return firstNamePart.split(/\s+/)[0];
+            }
+
+            // Default: Just take the first word of whatever is there
+            return trimmed.split(/\s+/)[0];
+        }
+
+        function parseStudentNames(text) {
+            // Only split by newline or semicolon, NOT comma (as comma is part of the name)
+            let rawParts = text.split(/[\n;]+/);
+            return rawParts
+                .map(n => formatStudentName(n))
+                .filter(n => n.length > 0);
+        }
+
+        function applyStudents(names) {
+            if (!names || names.length === 0) {
+                allStudents = [];
+                remainingStudents = [];
+                responderNameEl.textContent = "No students";
+                responderStatusEl.textContent = "Import or paste a list";
+                rollButtonEl.disabled = true;
+                hideResponderBox();
+                return;
+            }
+
+            allStudents = names;
+            remainingStudents = [...names];
+            responderNameEl.textContent = "Ready";
+            responderStatusEl.textContent = `Students loaded: ${names.length}`;
+            rollButtonEl.disabled = false;
+            showResponderBox();
+        }
+
+        function handleStudentFile(file) {
+            if (!file) return;
+
+            if (/\.xlsx?$/i.test(file.name)) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: "array" });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const sheetData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                        const names = [];
+
+                        // Try to identify which column contains names
+                        // Usually names are in column A (0) or have a header like "Name"
+                        let nameColIndex = 0;
+                        if (sheetData.length > 0) {
+                            const firstRow = sheetData[0].map(c => String(c).toLowerCase());
+                            const foundIndex = firstRow.findIndex(c => c.includes("name") || c.includes("student"));
+                            if (foundIndex !== -1) nameColIndex = foundIndex;
+                        }
+
+                        sheetData.forEach((row, rowIndex) => {
+                            // Skip if it is the first row and looks like a header
+                            if (rowIndex === 0) {
+                                const cellVal = String(row[nameColIndex] || "").toLowerCase();
+                                if (cellVal.includes("name") || cellVal.includes("student")) return;
+                            }
+
+                            const cellVal = row[nameColIndex];
+                            if (cellVal !== null && cellVal !== undefined && String(cellVal).trim().length > 0) {
+                                names.push(formatStudentName(String(cellVal)));
+                            }
+                        });
+                        applyStudents(names);
+                    } catch (err) {
+                        console.error(err);
+                        responderNameEl.textContent = "Error";
+                        responderStatusEl.textContent = "Could not read Excel file";
+                        rollButtonEl.disabled = true;
+                        hideResponderBox();
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const content = e.target.result || "";
+                    const names = parseStudentNames(content);
+                    applyStudents(names);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function startRoll() {
+            if (isRolling || remainingStudents.length === 0) {
+                if (remainingStudents.length === 0) {
+                    responderStatusEl.textContent = "All students have had a turn";
+                }
+                return;
+            }
+
+            isRolling = true;
+            rollButtonEl.disabled = true;
+            responderStatusEl.textContent = "Selecting...";
+
+            const duration = 2000;
+            const intervalMs = 80;
+            let elapsed = 0;
+
+            rollingInterval = setInterval(() => {
+                elapsed += intervalMs;
+                const randomName = remainingStudents[Math.floor(Math.random() * remainingStudents.length)];
+                responderNameEl.textContent = randomName;
+
+                if (elapsed >= duration) {
+                    clearInterval(rollingInterval);
+                    rollingInterval = null;
+
+                    const idx = Math.floor(Math.random() * remainingStudents.length);
+                    const chosen = remainingStudents[idx];
+                    responderNameEl.textContent = chosen;
+                    remainingStudents.splice(idx, 1);
+
+                    if (remainingStudents.length > 0) {
+                        responderStatusEl.textContent = `Remaining: ${remainingStudents.length}`;
+                        rollButtonEl.disabled = false;
+                    } else {
+                        responderStatusEl.textContent = "All students have had a turn";
+                        rollButtonEl.disabled = true;
+                    }
+
+                    isRolling = false;
+                }
+            }, intervalMs);
+        }
+
+        /* IMPORT MODAL */
+        importStudentsButton.onclick = () => {
+            studentsTextarea.value = "";
+            studentFileInput.value = "";
+            studentsModal.style.display = "flex";
+        };
+
+        studentsCancelBtn.onclick = () => {
+            studentsModal.style.display = "none";
+        };
+
+        studentsLoadPasteBtn.onclick = () => {
+            const text = studentsTextarea.value || "";
+            const names = parseStudentNames(text);
+            applyStudents(names);
+            studentsModal.style.display = "none";
+        };
+
+        studentFileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            handleStudentFile(file);
+        };
+
+        /* Roll button */
+        rollButtonEl.onclick = startRoll;
+
+        /* ---- SETTINGS UI ---- */
+        const settingsModal = document.getElementById("settingsModal");
+        const openSettingsBtn = document.getElementById("openSettings");
+        const closeSettingsBtn = document.getElementById("closeSettings");
+        const saveSettingsBtn = document.getElementById("saveSettings");
+        const settingsTable = document.getElementById("settingsTable");
+        const warningTimeInput = document.getElementById("warningTimeInput");
+        const warningSoundInput = document.getElementById("warningSoundInput");
+        const endSoundInput = document.getElementById("endSoundInput");
+        const downloadSettingsBtn = document.getElementById("downloadSettings");
+        const uploadSettingsInput = document.getElementById("uploadSettingsInput");
+
+        openSettingsBtn.onclick = () => {
+            settingsTable.innerHTML = "";
+            steps.forEach(step => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+            <td>${step.name}</td>
+            <td>
+                <input type="number" min="0.5" step="0.5" value="${step.minutes}" data-id="${step.id}"> min
+            </td>
+        `;
+                settingsTable.appendChild(row);
+            });
+
+            warningTimeInput.value = settings.warningTime ?? 10;
+            warningSoundInput.value = settings.warningSound || "ding.wav";
+            endSoundInput.value = settings.endSound || "chime.wav";
+
+            settingsModal.style.display = "flex";
+        };
+
+        closeSettingsBtn.onclick = () => settingsModal.style.display = "none";
+
+        saveSettingsBtn.onclick = () => {
+            settingsTable.querySelectorAll("input[type='number']").forEach(input => {
+                const id = input.dataset.id;
+                const mins = parseFloat(input.value);
+                const step = steps.find(s => s.id === id);
+                if (step && !isNaN(mins) && mins > 0) {
+                    step.minutes = mins;
+                }
+            });
+
+            const wt = parseInt(warningTimeInput.value, 10);
+            settings.warningTime = (!isNaN(wt) && wt >= 0) ? wt : 10;
+
+            settings.warningSound = warningSoundInput.value.trim() || "ding.wav";
+            settings.endSound = endSoundInput.value.trim() || "chime.wav";
+            beepWarningEl.src = settings.warningSound;
+            beepEndEl.src = settings.endSound;
+
+            saveSettings();
+            selectStep(currentStepIndex, true, false);
+
+            settingsModal.style.display = "none";
+        };
+
+        /* Download JSON */
+        downloadSettingsBtn.onclick = () => {
+            saveSettings();
+            const blob = new Blob([JSON.stringify(settings, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "reading_routines_settings.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        /* Upload JSON */
+        uploadSettingsInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = ev => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    Object.assign(settings, data || {});
+                    steps.forEach(step => {
+                        const mins = settings.stepMinutes?.[step.id];
+                        if (typeof mins === "number" && mins > 0) step.minutes = mins;
+                    });
+                    beepWarningEl.src = settings.warningSound || "ding.wav";
+                    beepEndEl.src = settings.endSound || "chime.wav";
+                    if (typeof settings.warningTime !== "number" || settings.warningTime < 0) {
+                        settings.warningTime = 10;
+                    }
+                    autoAdvance = settings.autoAdvance !== false;
+                    autoNextToggle.checked = autoAdvance;
+
+                    saveSettings();
+                    buildSidebar();
+                    selectStep(0, true, false);
+                    settingsModal.style.display = "none";
+                } catch (err) {
+                    alert("Could not load settings JSON.");
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        /* ---- KEYBOARD SHORTCUTS ---- */
+        document.addEventListener("keydown", (e) => {
+            const activeTag = document.activeElement.tagName;
+            if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
+            if (settingsModal.style.display === "flex" || studentsModal.style.display === "flex") return;
+
+            if (e.code === "ArrowUp") {
+                e.preventDefault();
+                if (currentStepIndex > 0) {
+                    selectStep(currentStepIndex - 1, true, false);
+                }
+            } else if (e.code === "ArrowDown") {
+                e.preventDefault();
+                if (currentStepIndex < steps.length - 1) {
+                    selectStep(currentStepIndex + 1, true, false);
+                }
+            } else if (e.code === "Space") {
+                e.preventDefault();
+                if (timerInterval) stopTimer();
+                else startTimer();
+            }
+        });
+
+        /* ---- INIT ---- */
+        loadSettings();
+        buildSidebar();
+        selectStep(0);
+
+        // Start with responder hidden if no students
+        hideResponderBox();
+    </script>
+</body>
+
+</html>

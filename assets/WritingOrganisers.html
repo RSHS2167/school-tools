@@ -1,0 +1,2354 @@
+<!doctype html>
+<html lang="en-AU">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Writing Organisers (Single-File App)</title>
+  <style>
+    :root {
+      --blue: #1e3a8a;
+      --blue2: #3b82f6;
+      --gold: #f59e0b;
+      --gold-hover: #d97706;
+      --white: #ffffff;
+      --bg: #f8fafc;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --card: #ffffff;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius: 12px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+
+      /* Organiser Sizes (responsive) */
+      /**
+       * These scale with the available viewport and container width.
+       * Big screens = bigger organisers; small screens = still usable.
+       */
+      --organiser-min: 320px;
+      --organiser-max: 980px;
+      --organiser-size: clamp(var(--organiser-min), 92vw, var(--organiser-max));
+
+      --y-size: clamp(360px, 70vw, 760px);
+      --venn-width: min(100%, 900px);
+      --venn-circle: clamp(300px, 50vw, 600px);
+      --mindmap-height: clamp(420px, 65vh, 720px);
+      --chart-scale: 1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--ink);
+      background-color: var(--bg);
+      background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+        radial-gradient(at 50% 0%, rgba(245, 158, 11, 0.05) 0px, transparent 50%);
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(90deg, var(--blue) 0%, var(--blue2) 100%);
+      color: var(--white);
+      padding: 18px 18px 16px;
+      border-bottom: 4px solid var(--gold);
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+      font-weight: 700;
+    }
+
+    .brand .sub {
+      margin: 4px 0 0;
+      font-size: 12px;
+      opacity: 0.9;
+      color: #e7efff;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    button,
+    select,
+    input[type="text"] {
+      font: inherit;
+    }
+
+    .btn {
+      border: 0;
+      background: var(--gold);
+      color: #1a1a1a;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(242, 183, 5, 0.25);
+      transition: transform .06s ease, filter .15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      filter: brightness(0.98)
+    }
+
+    .btn:active {
+      transform: translateY(1px)
+    }
+
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.14);
+      color: var(--white);
+      box-shadow: none;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--white);
+      box-shadow: none;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    main {
+      padding: 18px
+    }
+
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card .hd {
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+    }
+
+    .card .hd .title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(11, 58, 120, 0.08);
+      border: 1px solid rgba(11, 58, 120, 0.14);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .card .bd {
+      padding: 14px;
+    }
+
+    .setup-bar {
+      display: flex;
+      gap: 24px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .setup-item {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .setup-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      margin: 0 0 6px
+    }
+
+    select,
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      outline: none;
+      background: #fff;
+    }
+
+    select:focus,
+    input[type="text"]:focus {
+      border-color: rgba(15, 87, 184, 0.6);
+      box-shadow: 0 0 0 4px rgba(15, 87, 184, 0.10)
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+      margin-top: 10px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .row>* {
+      flex: 1
+    }
+
+    .row .tight {
+      flex: 0 0 auto
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .toolbar .btn {
+      padding: 9px 11px;
+      border-radius: 10px;
+      font-weight: 800;
+    }
+
+    .toolbar .btn.alt {
+      background: #ffffff;
+      color: var(--blue);
+      border: 1px solid rgba(11, 58, 120, 0.2);
+      box-shadow: none;
+    }
+
+    .statusbar {
+      padding: 10px 14px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+    }
+
+    .statusbar code {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: rgba(11, 58, 120, 0.06);
+      border: 1px solid rgba(11, 58, 120, 0.12);
+      padding: 3px 7px;
+      border-radius: 999px;
+      color: var(--blue);
+    }
+
+    /* Editable areas */
+    .editor {
+      padding: 14px;
+      min-height: 520px;
+    }
+
+    .explain {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .table th {
+      text-align: left;
+      padding: 10px 10px;
+      font-size: 12px;
+      background: rgba(11, 58, 120, 0.06);
+      color: var(--blue);
+      border-bottom: 1px solid var(--line);
+      font-weight: 900;
+    }
+
+    .table td {
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    .table tr:last-child td {
+      border-bottom: 0
+    }
+
+    .cell {
+      min-height: 44px;
+      padding: 8px 9px;
+      border-radius: 10px;
+      border: 1px dashed rgba(11, 58, 120, 0.20);
+      background: rgba(15, 87, 184, 0.03);
+      outline: none;
+      white-space: pre-wrap;
+    }
+
+    .cell:focus {
+      border-style: solid;
+      border-color: rgba(242, 183, 5, 0.8);
+      box-shadow: 0 0 0 4px rgba(242, 183, 5, 0.18);
+      background: #fff;
+    }
+
+    .mini-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .mini-actions .btn {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: none;
+      border: 1px solid rgba(11, 58, 120, 0.18);
+    }
+
+    .mini-actions .btn.alt {
+      background: #fff;
+      color: var(--blue);
+    }
+
+    /* Vertical row for sidebar */
+    .row-v {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-full {
+      width: 100%;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon {
+      font-size: 1.1em;
+    }
+
+    /* Graphic Y-Chart */
+    .y-chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      aspect-ratio: 1 / 1;
+      margin: 20px auto;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      border: 4px solid var(--blue);
+    }
+
+    .y-segment {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(50% 50%, 0 0, 100% 0);
+      transition: background 0.3s;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .y-segment:nth-child(1) {
+      /* Top/Looks */
+      background: rgba(59, 130, 246, 0.05);
+      clip-path: polygon(50% 50%, 0 0, 100% 0);
+    }
+
+    .y-segment:nth-child(2) {
+      /* Left/Sounds */
+      background: rgba(245, 158, 11, 0.05);
+      clip-path: polygon(50% 50%, 0 0, 0 100%, 50% 100%);
+      transform: rotate(-30deg);
+      transform-origin: center;
+    }
+
+    .y-segment:nth-child(3) {
+      /* Right/Feels */
+      background: rgba(16, 185, 129, 0.05);
+      clip-path: polygon(50% 50%, 100% 0, 100% 100%, 50% 100%);
+      transform: rotate(30deg);
+      transform-origin: center;
+    }
+
+    /* Better Y-Chart Layout using CSS Grids instead of clip-path hacks for simplicity and better editability */
+    .y-grid {
+      display: grid;
+      grid-template-areas:
+        "top top"
+        "left right";
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 20px;
+      height: var(--y-size);
+      position: relative;
+    }
+
+    .y-grid::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 50%;
+      background: var(--blue);
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+
+    .y-grid::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--blue);
+      transform: translateY(-50%) rotate(30deg);
+      z-index: 1;
+      display: none;
+      /* We'll use borders on the items instead */
+    }
+
+    .y-area {
+      padding: 20px;
+      border: 2px solid var(--line);
+      border-radius: var(--radius);
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .y-area.top {
+      grid-area: top;
+      border-bottom: 2px solid var(--blue);
+    }
+
+    .y-area.left {
+      grid-area: left;
+      border-right: 2px solid var(--blue);
+    }
+
+    .y-area.right {
+      grid-area: right;
+    }
+
+    .y-area h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: var(--blue);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .y-area-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    /* Custom scrollbar for areas */
+    .y-area-content::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .y-area-content::-webkit-scrollbar-thumb {
+      background: var(--line);
+      border-radius: 4px;
+    }
+
+    /* Actual Graphic Y-Chart using SVG paths for the lines */
+    .y-graphic {
+      position: relative;
+      width: 100%;
+      width: min(100%, var(--y-size));
+      min-height: min(100vw, var(--y-size));
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .y-svg-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .y-label-box {
+      position: absolute;
+      width: 32%;
+      height: clamp(180px, 28vw, 280px);
+      display: flex;
+      flex-direction: column;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .y-label-box.looks {
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 38%;
+    }
+
+    .y-label-box.sounds {
+      bottom: 12%;
+      left: 2%;
+    }
+
+    .y-label-box.feels {
+      bottom: 12%;
+      right: 2%;
+    }
+
+    /* Venn layout (simple, print-friendly) */
+    .venn {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .venn .bubble {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .venn .bubble h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: var(--blue);
+    }
+
+    .venn .overlap {
+      grid-column: 1 / -1;
+      border: 2px solid rgba(242, 183, 5, 0.55);
+      background: rgba(242, 183, 5, 0.08);
+    }
+
+    /* Mind map nodes */
+    .mind {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .mind .node {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .mind .node h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Flow Chart Layout */
+    .flow-path {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .flow-node {
+      width: 100%;
+      max-width: 500px;
+      padding: 15px;
+      background: #fff;
+      border: 2px solid var(--blue);
+      border-radius: 8px;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+
+    .flow-node::after {
+      content: "↓";
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
+      color: var(--blue);
+    }
+
+    .flow-node:last-child::after {
+      display: none;
+    }
+
+    /* Mind Map Layout */
+    .mind-graphic {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .mind-central {
+      background: var(--blue);
+      color: #fff;
+      padding: 25px;
+      border-radius: 50%;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .mind-branches {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      width: 100%;
+    }
+
+    .mind-branch {
+      background: #fff;
+      border: 2px solid var(--blue2);
+      border-radius: 15px;
+      padding: 15px;
+      position: relative;
+    }
+
+    /* Cause and Effect (Fishbone/Timeline) */
+    .ce-graphic {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      padding: 40px 0;
+    }
+
+    .ce-causes {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .ce-cause-set {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 15px;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .ce-cause-set .cell {
+      min-height: 40px;
+      height: auto;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+
+    .ce-cause-set:hover {
+      border-color: var(--blue);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    }
+
+    .ce-arrow {
+      font-size: 40px;
+      color: var(--blue);
+      padding: 0 10px;
+      flex-shrink: 0;
+    }
+
+    .ce-effect {
+      flex: 0 0 250px;
+      padding: 20px;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+    }
+
+    .ce-effect .cell {
+      color: #fff;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+      margin-top: 10px;
+    }
+
+    /* Cornell Notes Layout */
+    .cornell-layout {
+      display: grid;
+      grid-template-columns: 35% 65%;
+      gap: 0;
+      border: 2px solid var(--blue);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .cornell-col {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cornell-cues {
+      border-right: 2px solid var(--blue);
+      background: #f8fafc;
+    }
+
+    .cornell-header {
+      padding: 10px 15px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 800;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .cornell-summary-area {
+      grid-column: 1 / span 2;
+      border-top: 2px solid var(--blue);
+      padding: 15px;
+      background: #fff;
+    }
+
+    .cornell-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cornell-row:last-child {
+      border-bottom: 0;
+    }
+
+    .cornell-row .cell {
+      border-radius: 0;
+      border: 0;
+      min-height: 60px;
+      background: transparent;
+    }
+
+    .cornell-row .cell:focus {
+      background: #fff;
+      box-shadow: inset 0 0 0 2px var(--gold);
+    }
+
+    /* Print / PDF export styling */
+    @media print {
+
+      header,
+      .setup-card,
+      .toolbar,
+      .statusbar,
+      .explain,
+      .footer-note,
+      .exit-focus-btn {
+        display: none !important;
+      }
+
+      :root {
+        --y-size: 500px !important;
+        --venn-width: 650px !important;
+        --venn-circle: 450px !important;
+        --mindmap-height: 500px !important;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      main {
+        padding: 0;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        box-shadow: none;
+        border: 0;
+      }
+
+      .editor {
+        padding: 0;
+      }
+
+      .print-title {
+        display: block !important;
+        font-size: 28px;
+        font-weight: bold;
+        color: var(--blue);
+        margin-bottom: 40px;
+        text-align: center;
+        border-bottom: 3px solid var(--gold);
+        padding-bottom: 10px;
+      }
+
+      .venn-circle {
+        border: 2px solid var(--blue) !important;
+        background: transparent !important;
+      }
+
+      .venn-circle.right {
+        border-color: #d70c0b !important;
+      }
+
+      .venn-overlap-content {
+        background: transparent !important;
+      }
+
+      .cell {
+        border: 1px solid #999;
+        background: #fff;
+      }
+
+      .table,
+      .table th,
+      .table td {
+        border-color: #999;
+      }
+
+      .venn .overlap {
+        border-color: #999;
+        background: #fff;
+      }
+
+      .y-area-content {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+
+      .y-area-content .cell {
+        font-size: 10px !important;
+        min-height: auto !important;
+        padding: 4px 8px !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap brand">
+      <div>
+        <h1>Writing Organisers</h1>
+        <div class="sub">Pick a tool, fill it in, then save, open, print, or export to PDF (via print).</div>
+      </div>
+      <div class="top-actions">
+        <button class="btn secondary" id="btnPickFolder"
+          title="Choose a folder so the app can save files there (Chrome/Edge).">Choose Save Folder</button>
+        <button class="btn ghost" id="btnExportPDF" title="Opens print dialogue. Choose 'Save as PDF'.">Export
+          PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid">
+      <section class="card setup-card" aria-label="Controls">
+        <div class="bd">
+          <div class="setup-bar" style="align-items: center;">
+            <div class="setup-item" style="flex: 2;">
+              <label for="toolSelect">Organiser</label>
+              <select id="toolSelect"></select>
+            </div>
+
+            <div class="setup-item" style="flex: 3;">
+              <label for="docTitle">Document title</label>
+              <input type="text" id="docTitle" placeholder="e.g., Year 9 History: causes..." />
+            </div>
+
+            <div class="setup-item" style="flex: 0 0 auto;">
+              <label>&nbsp;</label>
+              <div class="setup-actions">
+                <button class="btn" id="btnNew" title="New project"><span class="icon">✨</span> New</button>
+                <button class="btn" id="btnSave" title="Save file"><span class="icon">💾</span> Save</button>
+                <button class="btn alt" id="btnOpen" title="Open file"><span class="icon">📂</span> Open</button>
+              </div>
+            </div>
+
+            <div class="setup-item" style="flex: 0 0 auto; text-align: right;">
+              <label>&nbsp;</label>
+              <div class="pill" id="autosavePill">Autosave: on</div>
+            </div>
+          </div>
+          <div class="hint" id="toolDesc" style="margin-top:8px;"></div>
+        </div>
+      </section>
+
+      <section class="card editor-card" aria-label="Editor">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <span class="pill" id="toolNamePill">Tool</span>
+            <span class="small" id="lastSavedLabel">Not saved yet</span>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn alt" id="btnCopyWord" title="Copy text for Word document">Copy for Word</button>
+            <button class="btn alt" id="btnAddRow">Add row</button>
+            <button class="btn alt" id="btnRemoveRow">Remove row</button>
+            <button class="btn alt" id="btnPrint">Print</button>
+          </div>
+        </div>
+
+        <div class="print-title" id="printTitle" style="display:none;"></div>
+        <div class="editor" id="editor"></div>
+
+        <div class="statusbar">
+          <div class="small">
+            Autosave file: <code id="autosaveKey">writing-organisers:autosave</code>
+          </div>
+          <div class="small">
+            Storage: <span id="storageInfo">–</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+
+  <script>
+    (() => {
+      // -----------------------------
+      // Tool definitions (short + practical)
+      // -----------------------------
+      const TOOLS = [
+        {
+          id: "tchart",
+          name: "T-Chart",
+          desc: "Two-column organiser used to compare ideas, list pros and cons, or sort evidence.",
+          kind: "table2",
+          headers: ["Side A", "Side B"],
+          defaultRows: 6
+        },
+        {
+          id: "venn",
+          name: "Venn Diagram",
+          desc: "Overlapping circles used to compare similarities and differences between two or more ideas.",
+          kind: "venn",
+          defaultRows: 6
+        },
+        {
+          id: "cornell",
+          name: "Cornell Notes",
+          desc: "A systematic format for condensing and organising notes with Cues, Notes, and a Summary section.",
+          kind: "cornell",
+          defaultRows: 8
+        },
+        {
+          id: "kwl",
+          name: "KWL Chart",
+          desc: "A tool to track what you Know, Want to know, and have Learned.",
+          kind: "kwl",
+          defaultRows: 6
+        },
+        {
+          id: "ychart",
+          name: "Y-Chart",
+          desc: "Organises thinking around 'Looks like', 'Sounds like', and 'Feels like'.",
+          kind: "ychart",
+          headers: ["Looks like", "Sounds like", "Feels like"],
+          defaultRows: 3
+        },
+        {
+          id: "pmi",
+          name: "PMI Chart (Plus, Minus, Interesting)",
+          desc: "Helps students evaluate an idea by considering positives, negatives, and interesting points.",
+          kind: "table3",
+          headers: ["Plus", "Minus", "Interesting"],
+          defaultRows: 6
+        },
+        {
+          id: "teel_english",
+          name: "TEEL Paragraph (English)",
+          desc: "Topic Sentence, Explain, Evidence, Link.",
+          kind: "teel_english",
+          defaultRows: 4
+        },
+        {
+          id: "teel_hass",
+          name: "TEE/EL Paragraph (HASS)",
+          desc: "Topic Sentence, Explain, Evidence, Evaluate, Link.",
+          kind: "teel_hass",
+          defaultRows: 5
+        },
+        {
+          id: "flow",
+          name: "Flow Chart",
+          desc: "Used to sequence ideas, processes, or events. Helpful for procedural or narrative writing.",
+          kind: "flow",
+          defaultRows: 6
+        },
+        {
+          id: "mindmap",
+          name: "Mind Map / Spider Diagram",
+          desc: "Central idea with branching sub-ideas. Useful for brainstorming and planning extended responses.",
+          kind: "mindmap",
+          defaultRows: 6
+        },
+        {
+          id: "causeeffect",
+          name: "Cause and Effect Chart",
+          desc: "Organises reasons and outcomes.",
+          kind: "causeeffect",
+          headers: ["Causes / Reasons", "Effects / Outcomes"],
+          defaultRows: 4
+        },
+        {
+          id: "qae",
+          name: "Question–Answer–Evidence (QAE)",
+          desc: "Supports analytical writing by linking a question directly to evidence and explanation.",
+          kind: "qae",
+          defaultRows: 5
+        },
+        {
+          id: "storyboard",
+          name: "Storyboard",
+          desc: "Visual organiser for narrative writing, media texts, or multimodal planning.",
+          kind: "storyboard",
+          defaultRows: 6
+        }
+      ];
+
+      // -----------------------------
+      // State + persistence
+      // -----------------------------
+      const AUTOSAVE_KEY = "writing-organisers:autosave:v1";
+      const AUTOSAVE_INTERVAL_MS = 2000; // live-ish, without being annoying
+
+      let state = {
+        version: 1,
+        toolId: TOOLS[0].id,
+        title: "",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        rows: [],           // tool-specific content (generic row structure)
+        meta: {}            // tool-specific settings e.g. peel variant
+      };
+
+      // Optional folder handle (File System Access API)
+      let folderHandle = null;
+      let lastSavedPath = "";
+      let autosaveTimer = null;
+      let dirtySinceSave = false;
+
+      // -----------------------------
+      // DOM
+      // -----------------------------
+      const elToolSelect = document.getElementById("toolSelect");
+      const elDocTitle = document.getElementById("docTitle");
+      const elToolDesc = document.getElementById("toolDesc");
+      const elEditor = document.getElementById("editor");
+      const elToolNamePill = document.getElementById("toolNamePill");
+      const elLastSavedLabel = document.getElementById("lastSavedLabel");
+      const elStorageInfo = document.getElementById("storageInfo");
+      const elAutosaveKey = document.getElementById("autosaveKey");
+      const elAutosavePill = document.getElementById("autosavePill");
+
+      const btnNew = document.getElementById("btnNew");
+      const btnSave = document.getElementById("btnSave");
+      const btnOpen = document.getElementById("btnOpen");
+      const btnAddRow = document.getElementById("btnAddRow");
+      const btnRemoveRow = document.getElementById("btnRemoveRow");
+      const btnPrint = document.getElementById("btnPrint");
+      const btnExportPDF = document.getElementById("btnExportPDF");
+      const btnPickFolder = document.getElementById("btnPickFolder");
+      const btnCopyWord = document.getElementById("btnCopyWord");
+
+      elAutosaveKey.textContent = AUTOSAVE_KEY;
+
+      // -----------------------------
+      // Helpers
+      // -----------------------------
+      function nowISO() { return new Date().toISOString(); }
+      function getTool(toolId) { return TOOLS.find(t => t.id === toolId) || TOOLS[0]; }
+
+      function setStatusSaved(text) {
+        elLastSavedLabel.textContent = text;
+        dirtySinceSave = false;
+      }
+      function setStatusDirty() {
+        dirtySinceSave = true;
+        elLastSavedLabel.textContent = "Unsaved changes";
+      }
+
+      function safeJsonParse(s) {
+        try { return JSON.parse(s); } catch { return null; }
+      }
+
+      function estimateLocalStorageUsage() {
+        // Not perfect, but useful feedback.
+        const s = localStorage.getItem(AUTOSAVE_KEY) || "";
+        const bytes = new Blob([s]).size;
+        const kb = Math.round(bytes / 1024);
+        return kb + " KB in autosave";
+      }
+
+      // -----------------------------
+      // Data initialisers per tool
+      // -----------------------------
+      function makeBlankRowsForTool(toolId, rowCount) {
+        const tool = getTool(toolId);
+        const n = rowCount ?? tool.defaultRows ?? 6;
+
+        switch (tool.kind) {
+          case "table2":
+            return Array.from({ length: n }, () => ({ a: "", b: "" }));
+          case "table3":
+            return Array.from({ length: n }, () => ({ a: "", b: "", c: "" }));
+          case "ychart":
+            return {
+              looks: ["", "", ""],
+              sounds: ["", "", ""],
+              feels: ["", "", ""]
+            };
+          case "venn":
+            return {
+              left: Array.from({ length: n }, () => ""),
+              overlap: Array.from({ length: Math.max(4, Math.ceil(n / 2)) }, () => ""),
+              right: Array.from({ length: n }, () => "")
+            };
+          case "cornell":
+            return {
+              goal: "",
+              rows: Array.from({ length: n }, () => ({ cue: "", note: "" })),
+              summary: ""
+            };
+          case "kwl":
+            return Array.from({ length: n }, () => ({ k: "", w: "", l: "" }));
+          case "teel_english":
+            return [
+              { label: "Topic Sentence", text: "" },
+              { label: "Explain", text: "" },
+              { label: "Evidence", text: "" },
+              { label: "Link", text: "" }
+            ];
+          case "teel_hass":
+            return [
+              { label: "Topic Sentence", text: "" },
+              { label: "Explain", text: "" },
+              { label: "Evidence", text: "" },
+              { label: "Evaluate Evidence", text: "" },
+              { label: "Link", text: "" }
+            ];
+          case "flow":
+            return Array.from({ length: n }, (_, i) => ({ step: (i + 1), text: "" }));
+          case "mindmap":
+            return {
+              nodes: [
+                { id: 0, x: 400, y: 300, baseX: 400, baseY: 300, text: "Central Idea", color: "#3B82F6", floatAngle: 0, floatSpeed: 0.005, floatRadius: 5 }
+              ],
+              links: []
+            };
+          case "causeeffect":
+            return Array.from({ length: n }, () => ({ a: "", b: "" }));
+          case "qae":
+            return Array.from({ length: n }, () => ({ q: "", a: "", e: "" }));
+          case "storyboard":
+            return Array.from({ length: n }, (_, i) => ({ frame: i + 1, scene: "", notes: "" }));
+          default:
+            return Array.from({ length: n }, () => ({ a: "", b: "" }));
+        }
+      }
+
+      function resetState(toolId) {
+        const t = getTool(toolId);
+        state = {
+          version: 1,
+          toolId: t.id,
+          title: "",
+          createdAt: nowISO(),
+          updatedAt: nowISO(),
+          rows: makeBlankRowsForTool(t.id),
+          meta: {}
+        };
+        lastSavedPath = "";
+        setStatusSaved("Not saved yet");
+        render();
+        autosaveNow();
+      }
+
+      // -----------------------------
+      // Rendering
+      // -----------------------------
+      function render() {
+        const tool = getTool(state.toolId);
+        elToolNamePill.textContent = tool.name;
+        elToolDesc.textContent = tool.desc;
+        elDocTitle.value = state.title || "";
+
+        // Choose editor
+        elEditor.innerHTML = "";
+        const p = document.createElement("p");
+        p.className = "explain";
+        p.textContent = tool.desc;
+        elEditor.appendChild(p);
+
+        const content = buildToolEditor(tool);
+        elEditor.appendChild(content);
+
+        // Print header sync
+        const elPrintTitle = document.getElementById("printTitle");
+        if (elPrintTitle) {
+          elPrintTitle.textContent = state.title || "Untitled Document";
+        }
+
+        elStorageInfo.textContent = estimateLocalStorageUsage();
+      }
+
+      function makeEditableCell(value, onInput) {
+        const div = document.createElement("div");
+        div.className = "cell";
+        div.contentEditable = "true";
+        div.spellcheck = true;
+        div.textContent = value ?? "";
+        div.addEventListener("input", () => onInput(div.textContent));
+        return div;
+      }
+
+      function buildTable(headers, rows, onChange) {
+        const table = document.createElement("table");
+        table.className = "table";
+        const thead = document.createElement("thead");
+        const trh = document.createElement("tr");
+        headers.forEach(h => {
+          const th = document.createElement("th");
+          th.textContent = h;
+          trh.appendChild(th);
+        });
+        thead.appendChild(trh);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        rows.forEach((row, idx) => {
+          const tr = document.createElement("tr");
+          headers.forEach((h, colIdx) => {
+            const td = document.createElement("td");
+            const key = colIdx === 0 ? "a" : colIdx === 1 ? "b" : "c";
+            const cell = makeEditableCell(row[key], (txt) => onChange(idx, key, txt));
+            td.appendChild(cell);
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        return table;
+      }
+
+      function buildToolEditor(tool) {
+        const wrap = document.createElement("div");
+
+        if (tool.kind === "table2" || tool.kind === "table3") {
+          const t = buildTable(tool.headers, state.rows, (idx, key, txt) => {
+            state.rows[idx][key] = txt;
+            markUpdated();
+          });
+          wrap.appendChild(t);
+          return wrap;
+        }
+
+        if (tool.kind === "ychart") {
+          const container = document.createElement("div");
+          container.className = "y-graphic";
+
+          // Stem DOWN, arms UP (Standard Y shape)
+          const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          svg.setAttribute("viewBox", "0 0 100 100");
+          svg.setAttribute("class", "y-svg-bg");
+          svg.innerHTML = `
+            <line x1="50" y1="50" x2="50" y2="100" stroke="var(--blue)" stroke-width="1.5" />
+            <line x1="50" y1="50" x2="5" y2="25" stroke="var(--blue)" stroke-width="1.5" />
+            <line x1="50" y1="50" x2="95" y2="25" stroke="var(--blue)" stroke-width="1.5" />
+            <circle cx="50" cy="50" r="2" fill="var(--blue)" />
+          `;
+          container.appendChild(svg);
+
+          const roles = [
+            { key: "looks", label: "Looks Like", class: "looks" },
+            { key: "sounds", label: "Sounds Like", class: "sounds" },
+            { key: "feels", label: "Feels Like", class: "feels" }
+          ];
+
+          roles.forEach((r) => {
+            const box = document.createElement("div");
+            box.className = `y-label-box ${r.class}`;
+            box.innerHTML = `<h3 style="font-size:14px; color:var(--blue); margin-bottom:5px;">${r.label}</h3>`;
+
+            if (!state.rows[r.key]) state.rows[r.key] = ["", "", ""];
+
+            const list = document.createElement("div");
+            list.className = "y-area-content";
+
+            state.rows[r.key].forEach((text, i) => {
+              const cell = makeEditableCell(text, (val) => {
+                state.rows[r.key][i] = val;
+                markUpdated();
+              });
+              list.appendChild(cell);
+            });
+
+            box.style.height = "auto";
+            box.style.minHeight = "clamp(180px, 28vw, 280px)";
+            box.appendChild(list);
+            container.appendChild(box);
+          });
+
+          wrap.appendChild(container);
+          return wrap;
+        }
+
+        if (tool.kind === "venn") {
+          const vennWrap = document.createElement("div");
+          vennWrap.style = `position:relative; width:100%; min-height:var(--venn-circle); transition: all 0.3s ease; margin:40px auto;`;
+
+          // Outline Layer (Behind everything)
+          const outlineContainer = document.createElement("div");
+          outlineContainer.style = `position:absolute; top:0; left:50%; transform:translateX(-50%); width:100%; height:100%; display:flex; justify-content:center; align-items:flex-start; pointer-events:none; z-index:0;`;
+
+          const circleOutlineStyle = `width:var(--venn-circle); min-height:var(--venn-circle); height:100%; border-radius:1000px; border:3px solid transparent; transition: all 0.3s ease; flex-shrink:0;`;
+
+          const leftOutline = document.createElement("div");
+          leftOutline.className = "venn-circle left";
+          leftOutline.style = circleOutlineStyle + "margin-right:-150px; background:rgba(59, 130, 246, 0.03); border-color:rgba(59, 130, 246, 0.3);";
+
+          const rightOutline = document.createElement("div");
+          rightOutline.className = "venn-circle right";
+          rightOutline.style = circleOutlineStyle + "margin-left:-150px; background:rgba(215, 12, 11, 0.03); border-color:rgba(215, 12, 11, 0.3);";
+
+          outlineContainer.appendChild(leftOutline);
+          outlineContainer.appendChild(rightOutline);
+          vennWrap.appendChild(outlineContainer);
+
+          // Content Layer (In front)
+          const contentWrap = document.createElement("div");
+          contentWrap.style = `display:flex; justify-content:center; align-items:flex-start; position:relative; width:100%; z-index:1;`;
+
+          // Left Side (Different)
+          const leftSide = document.createElement("div");
+          leftSide.style = `width:var(--venn-circle); padding:clamp(40px, 8vw, 100px) clamp(20px, 4vw, 60px); display:flex; flex-direction:column; margin-right:-150px; flex-shrink:0;`;
+          leftSide.innerHTML = `<h3 style="text-align:left; margin-bottom:15px; color:var(--blue); font-weight:900; letter-spacing:1px; text-transform:uppercase; font-size:14px; opacity:0.8;">Different</h3>`;
+          const leftContent = document.createElement("div");
+          leftContent.style = `display:flex; flex-direction:column; gap:8px; width:45%;`;
+          state.rows.left.forEach((v, i) => leftContent.appendChild(makeEditableCell(v, (txt) => { state.rows.left[i] = txt; markUpdated(); })));
+          leftSide.appendChild(leftContent);
+
+          // Right Side (Different)
+          const rightSide = document.createElement("div");
+          rightSide.style = `width:var(--venn-circle); padding:clamp(40px, 8vw, 100px) clamp(20px, 4vw, 60px); display:flex; flex-direction:column; align-items:flex-end; margin-left:-150px; flex-shrink:0;`;
+          rightSide.innerHTML = `<h3 style="text-align:right; margin-bottom:15px; color:var(--blue); font-weight:900; letter-spacing:1px; text-transform:uppercase; font-size:14px; opacity:0.8;">Different</h3>`;
+          const rightContent = document.createElement("div");
+          rightContent.style = `display:flex; flex-direction:column; gap:8px; width:45%; text-align:right;`;
+          state.rows.right.forEach((v, i) => rightContent.appendChild(makeEditableCell(v, (txt) => { state.rows.right[i] = txt; markUpdated(); })));
+          rightSide.appendChild(rightContent);
+
+          contentWrap.appendChild(leftSide);
+          contentWrap.appendChild(rightSide);
+          vennWrap.appendChild(contentWrap);
+
+          // Overlap Area (Same) - Also in front
+          const overlapArea = document.createElement("div");
+          overlapArea.className = "venn-overlap-content";
+          overlapArea.style = `position:absolute; left:50%; top: clamp(80px, 15vw, 150px); transform:translateX(-50%); width:200px; display:flex; flex-direction:column; gap:5px; z-index:5; transition: all 0.3s ease;`;
+          overlapArea.innerHTML = `<h3 style="text-align:center; color:var(--gold); margin-bottom:15px; font-weight:900; letter-spacing:1px; text-transform:uppercase; font-size:14px;">Same</h3>`;
+          const overlapList = document.createElement("div");
+          overlapList.style = "display:flex; flex-direction:column; gap:8px; padding:5px;";
+          state.rows.overlap.forEach((v, i) => overlapList.appendChild(makeEditableCell(v, (txt) => { state.rows.overlap[i] = txt; markUpdated(); })));
+          overlapArea.appendChild(overlapList);
+
+          vennWrap.appendChild(overlapArea);
+
+          wrap.appendChild(vennWrap);
+          return wrap;
+        }
+
+
+
+        if (tool.kind === "teel_english" || tool.kind === "teel_hass" || tool.kind === "peel") {
+          const container = document.createElement("div");
+          container.style.display = "flex";
+          container.style.flexDirection = "column";
+          container.style.gap = "40px";
+
+          // Group into Paragraphs (sets of 4 for English, 5 for HASS/generic)
+          const stepsPerP = (tool.kind === "teel_english") ? 4 : 5;
+          for (let i = 0; i < state.rows.length; i += stepsPerP) {
+            const pNum = (i / stepsPerP) + 1;
+            const pDiv = document.createElement("div");
+            pDiv.innerHTML = `<h2 style="font-size:16px; color:var(--blue); margin-bottom:15px; border-bottom:1px solid var(--line); padding-bottom:5px;">Paragraph ${pNum}</h2>`;
+
+            const table = document.createElement("table");
+            table.className = "table";
+            const tbody = document.createElement("tbody");
+
+            for (let j = i; j < i + stepsPerP && j < state.rows.length; j++) {
+              const r = state.rows[j];
+              const tr = document.createElement("tr");
+              const td1 = document.createElement("td");
+              td1.style.width = "200px";
+              td1.innerHTML = `<strong>${escapeHtml(r.label)}</strong>`;
+              const td2 = document.createElement("td");
+              td2.appendChild(makeEditableCell(r.text, (txt) => { state.rows[j].text = txt; markUpdated(); }));
+              tr.appendChild(td1); tr.appendChild(td2);
+              tbody.appendChild(tr);
+            }
+            table.appendChild(tbody);
+            pDiv.appendChild(table);
+            container.appendChild(pDiv);
+          }
+          wrap.appendChild(container);
+          return wrap;
+        }
+
+        if (tool.kind === "flow") {
+          const container = document.createElement("div");
+          container.className = "flow-path";
+
+          state.rows.forEach((r, idx) => {
+            const node = document.createElement("div");
+            node.className = "flow-node";
+            node.innerHTML = `<div class="small" style="margin-bottom:5px; font-weight:bold; color:var(--blue);">Step ${idx + 1}</div>`;
+            node.appendChild(makeEditableCell(r.text, (txt) => { state.rows[idx].text = txt; markUpdated(); }));
+            container.appendChild(node);
+          });
+
+          wrap.appendChild(container);
+          return wrap;
+        }
+
+        if (tool.kind === "mindmap") {
+          initMindMapCanvas(wrap);
+          wrap.style.height = "var(--mindmap-height)";
+          wrap.style.transition = "all 0.3s ease";
+          return wrap;
+        }
+
+        if (tool.kind === "causeeffect") {
+          const container = document.createElement("div");
+          container.className = "ce-graphic";
+          container.style.maxWidth = "1000px";
+          container.style.margin = "0 auto";
+
+          const causesCol = document.createElement("div");
+          causesCol.className = "ce-causes";
+          causesCol.style.flex = "0 1 400px"; // Don't let it push the effect too far
+
+          state.rows.forEach((r, idx) => {
+            const row = document.createElement("div");
+            row.className = "ce-cause-set";
+            row.innerHTML = `<div class="small" style="color:var(--blue); font-weight:bold; margin-bottom:5px;">Cause ${idx + 1}</div>`;
+            row.appendChild(makeEditableCell(r.a, (txt) => { state.rows[idx].a = txt; markUpdated(); }));
+            causesCol.appendChild(row);
+          });
+
+          const arrow = document.createElement("div");
+          arrow.className = "ce-arrow";
+          arrow.innerHTML = "➔";
+
+          const effectBox = document.createElement("div");
+          effectBox.className = "ce-effect";
+          effectBox.innerHTML = `<div style="font-size:12px; opacity:0.8; margin-bottom:10px; font-weight:bold; letter-spacing:1px; text-transform:uppercase;">The Effect</div>`;
+          effectBox.appendChild(makeEditableCell(state.meta.effect || "Describe effect...", (txt) => { state.meta.effect = txt; markUpdated(); }));
+
+          container.appendChild(causesCol);
+          container.appendChild(arrow);
+          container.appendChild(effectBox);
+          wrap.appendChild(container);
+          return wrap;
+        }
+
+        if (tool.kind === "cornell") {
+          const container = document.createElement("div");
+          container.className = "cornell-layout";
+
+          // Learning Goal Area
+          if (state.rows.goal === undefined) state.rows.goal = "";
+          const goalArea = document.createElement("div");
+          goalArea.className = "cornell-summary-area"; // Reusing summary style for consistency
+          goalArea.style.marginBottom = "20px";
+          goalArea.innerHTML = '<div class="cornell-header" style="margin-bottom:10px; border-radius:4px; background:var(--blue); color:#fff; font-weight:900;">Learning Goal</div>';
+          goalArea.appendChild(makeEditableCell(state.rows.goal, (txt) => { state.rows.goal = txt; markUpdated(); }));
+
+          const mainCols = document.createElement("div");
+          mainCols.style.display = "flex";
+          mainCols.style.gap = "0";
+          mainCols.style.border = "1px solid var(--line)";
+          mainCols.style.borderRadius = "8px";
+          mainCols.style.overflow = "hidden";
+          mainCols.style.marginBottom = "20px";
+
+          const cuesCol = document.createElement("div");
+          cuesCol.className = "cornell-col cornell-cues";
+          cuesCol.innerHTML = '<div class="cornell-header">Cues / Questions</div>';
+
+          const notesCol = document.createElement("div");
+          notesCol.className = "cornell-col cornell-notes";
+          notesCol.innerHTML = '<div class="cornell-header">Notes</div>';
+
+          state.rows.rows.forEach((r, idx) => {
+            const cueCell = makeEditableCell(r.cue, (txt) => { state.rows.rows[idx].cue = txt; markUpdated(); });
+            const noteCell = makeEditableCell(r.note, (txt) => { state.rows.rows[idx].note = txt; markUpdated(); });
+
+            const cueRow = document.createElement("div");
+            cueRow.className = "cornell-row";
+            cueRow.appendChild(cueCell);
+            cuesCol.appendChild(cueRow);
+
+            const noteRow = document.createElement("div");
+            noteRow.className = "cornell-row";
+            noteRow.appendChild(noteCell);
+            notesCol.appendChild(noteRow);
+          });
+
+          mainCols.appendChild(cuesCol);
+          mainCols.appendChild(notesCol);
+
+          const summaryArea = document.createElement("div");
+          summaryArea.className = "cornell-summary-area";
+          summaryArea.innerHTML = '<div class="cornell-header" style="margin-bottom:10px; border-radius:4px;">Summary</div>';
+          summaryArea.appendChild(makeEditableCell(state.rows.summary, (txt) => { state.rows.summary = txt; markUpdated(); }));
+
+          container.appendChild(goalArea);
+          container.appendChild(mainCols);
+          container.appendChild(summaryArea);
+          wrap.appendChild(container);
+          return wrap;
+        }
+
+        if (tool.kind === "qae" || tool.kind === "storyboard" || tool.kind === "kwl") {
+          let headers = [];
+          if (tool.kind === "qae") headers = ["Question", "Answer", "Evidence"];
+          else if (tool.kind === "storyboard") headers = ["Frame", "Scene", "Notes"];
+          else if (tool.kind === "kwl") headers = ["K: What I Know", "W: What I Want to Know", "L: What I Learned"];
+
+          const table = buildTable(headers, state.rows, (idx, key, txt) => {
+            const keys = tool.kind === "qae" ? ["q", "a", "e"] :
+              tool.kind === "storyboard" ? ["frame", "scene", "notes"] :
+                ["k", "w", "l"];
+            const k = key === "a" ? keys[0] : key === "b" ? keys[1] : keys[2];
+            state.rows[idx][k] = txt;
+            markUpdated();
+          });
+          wrap.appendChild(table);
+          return wrap;
+        }
+
+        wrap.appendChild(document.createTextNode("Unknown tool type."));
+        return wrap;
+      }
+
+
+      // -----------------------------
+      // Mind Map Logic
+      // -----------------------------
+      let mmCanvas = null, mmCtx = null, mmScale = 1, mmOffset = { dx: 0, dy: 0 };
+      let mmDragging = null, mmDragOffset = { x: 0, y: 0 };
+      let mmConnectingFrom = null, mmIsPanning = false, mmPanStart = { x: 0, y: 0 }, mmInitialOffset = { dx: 0, dy: 0 };
+      let mmMouseDownPos = null, mmClickedCandidate = null;
+
+      function initMindMapCanvas(container) {
+        container.style.position = "relative";
+        container.style.height = "var(--mindmap-height)";
+        container.style.background = "var(--card)";
+        container.style.border = "1px solid var(--line)";
+        container.style.borderRadius = "12px";
+        container.style.overflow = "hidden";
+
+        const canvas = document.createElement("canvas");
+        // Canvas size is set dynamically to match the container
+        canvas.width = 800;
+        canvas.height = 600;
+        canvas.style.display = "block";
+        canvas.style.cursor = "crosshair";
+        container.appendChild(canvas);
+
+        mmCanvas = canvas;
+        mmCtx = canvas.getContext("2d");
+
+        const ro = new ResizeObserver(() => {
+          const w = Math.max(320, container.clientWidth);
+          const h = Math.max(360, container.clientHeight);
+          canvas.width = w;
+          canvas.height = h;
+        });
+        ro.observe(container);
+
+        // UI Overlay
+        const help = document.createElement("div");
+        help.style = "position:absolute; bottom:10px; left:10px; font-size:11px; color:#555; pointer-events:none;";
+        help.innerHTML = `Click base to add node • Drag to move • Click node then another to link • Double-click node to edit/delete`;
+        container.appendChild(help);
+
+        // Events
+        canvas.onmousedown = (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const cx = (e.clientX - rect.left - mmOffset.dx) / mmScale;
+          const cy = (e.clientY - rect.top - mmOffset.dy) / mmScale;
+          mmMouseDownPos = { x: e.clientX, y: e.clientY };
+
+          if (e.button === 1) { // Middle pan
+            mmIsPanning = true;
+            mmPanStart = { x: e.clientX, y: e.clientY };
+            mmInitialOffset = { ...mmOffset };
+            return;
+          }
+
+          let hit = null;
+          state.rows.nodes.forEach(n => {
+            if (Math.hypot(n.baseX - cx, n.baseY - cy) < 50) hit = n;
+          });
+
+          if (hit) {
+            mmClickedCandidate = hit;
+            mmDragging = hit;
+            mmDragOffset = { x: cx - hit.baseX, y: cy - hit.baseY };
+          } else {
+            // Add new node
+            const txt = prompt("New thought:");
+            if (txt) {
+              const id = Date.now();
+              state.rows.nodes.push({
+                id, x: cx, y: cy, baseX: cx, baseY: cy,
+                text: txt, color: "#3B82F6",
+                floatAngle: Math.random() * 2 * Math.PI, floatSpeed: 0.005, floatRadius: 5
+              });
+              markUpdated();
+            }
+          }
+        };
+
+        canvas.onmousemove = (e) => {
+          const rect = canvas.getBoundingClientRect();
+          if (mmIsPanning) {
+            mmOffset.dx = mmInitialOffset.dx + (e.clientX - mmPanStart.x);
+            mmOffset.dy = mmInitialOffset.dy + (e.clientY - mmPanStart.y);
+          } else if (mmDragging) {
+            const cx = (e.clientX - rect.left - mmOffset.dx) / mmScale;
+            const cy = (e.clientY - rect.top - mmOffset.dy) / mmScale;
+            mmDragging.baseX = cx - mmDragOffset.x;
+            mmDragging.baseY = cy - mmDragOffset.y;
+            mmDragging.x = mmDragging.baseX;
+            mmDragging.y = mmDragging.baseY;
+          }
+        };
+
+        canvas.onmouseup = (e) => {
+          if (mmIsPanning) { mmIsPanning = false; return; }
+          mmDragging = null;
+
+          if (mmClickedCandidate && mmMouseDownPos && Math.hypot(e.clientX - mmMouseDownPos.x, e.clientY - mmMouseDownPos.y) < 5) {
+            if (mmConnectingFrom && mmConnectingFrom !== mmClickedCandidate) {
+              const linkIdx = state.rows.links.findIndex(l => (l[0] === mmConnectingFrom.id && l[1] === mmClickedCandidate.id) || (l[1] === mmConnectingFrom.id && l[0] === mmClickedCandidate.id));
+              if (linkIdx !== -1) state.rows.links.splice(linkIdx, 1);
+              else state.rows.links.push([mmConnectingFrom.id, mmClickedCandidate.id]);
+              mmConnectingFrom = null;
+              markUpdated();
+            } else {
+              mmConnectingFrom = mmClickedCandidate;
+            }
+          }
+          mmClickedCandidate = null;
+        };
+
+        canvas.ondblclick = (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const cx = (e.clientX - rect.left - mmOffset.dx) / mmScale;
+          const cy = (e.clientY - rect.top - mmOffset.dy) / mmScale;
+          let hit = null, hitIdx = -1;
+          state.rows.nodes.forEach((n, i) => {
+            if (Math.hypot(n.baseX - cx, n.baseY - cy) < 50) { hit = n; hitIdx = i; }
+          });
+
+          if (hit) {
+            const res = prompt("Edit text (leave empty to delete):", hit.text);
+            if (res === null) return;
+            if (res === "") {
+              state.rows.nodes.splice(hitIdx, 1);
+              state.rows.links = state.rows.links.filter(l => l[0] !== hit.id && l[1] !== hit.id);
+            } else {
+              hit.text = res;
+            }
+            markUpdated();
+          }
+        };
+
+        canvas.onwheel = (e) => {
+          e.preventDefault();
+          const zoom = 0.05, rect = canvas.getBoundingClientRect();
+          const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+          const factor = e.deltaY > 0 ? (1 - zoom) : (1 + zoom);
+          mmOffset.dx = mx - (mx - mmOffset.dx) * factor;
+          mmOffset.dy = my - (my - mmOffset.dy) * factor;
+          mmScale *= factor;
+        };
+
+        function tick() {
+          if (state.toolId !== "mindmap") return;
+          mmCtx.setTransform(mmScale, 0, 0, mmScale, mmOffset.dx, mmOffset.dy);
+          mmCtx.clearRect(-mmOffset.dx / mmScale, -mmOffset.dy / mmScale, canvas.width / mmScale, canvas.height / mmScale);
+
+          // Draw Links
+          state.rows.links.forEach(([id1, id2]) => {
+            const n1 = state.rows.nodes.find(n => n.id === id1);
+            const n2 = state.rows.nodes.find(n => n.id === id2);
+            if (n1 && n2) {
+              mmCtx.beginPath();
+              mmCtx.strokeStyle = "#CBD5E1";
+              mmCtx.lineWidth = 2;
+              mmCtx.moveTo(n1.x, n1.y);
+              mmCtx.lineTo(n2.x, n2.y);
+              mmCtx.stroke();
+            }
+          });
+
+          // Draw Nodes
+          state.rows.nodes.forEach(n => {
+            n.floatAngle += n.floatSpeed;
+            n.x = n.baseX + Math.cos(n.floatAngle) * n.floatRadius;
+            n.y = n.baseY + Math.sin(n.floatAngle) * n.floatRadius;
+
+            mmCtx.beginPath();
+            mmCtx.fillStyle = n.color || "#3B82F6";
+            if (mmConnectingFrom === n) mmCtx.shadowBlur = 15;
+            mmCtx.arc(n.x, n.y, 45, 0, Math.PI * 2);
+            mmCtx.fill();
+            mmCtx.shadowBlur = 0;
+
+            mmCtx.fillStyle = "white";
+            mmCtx.font = "bold 12px sans-serif";
+            mmCtx.textAlign = "center";
+            mmCtx.fillText(n.text, n.x, n.y + 4);
+          });
+
+          requestAnimationFrame(tick);
+        }
+        tick();
+      }
+
+      function applyFrameworkLabels() {
+        if (!Array.isArray(state.rows) || state.rows.length < 5) return;
+        const labels = ["Topic Sentence", "Explain", "Evidence", "Evaluate", "Link"];
+
+        for (let i = 0; i < state.rows.length; i++) {
+          state.rows[i].label = labels[i % 5];
+        }
+      }
+
+      function escapeHtml(s) {
+        return String(s ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function markUpdated() {
+        state.updatedAt = nowISO();
+        setStatusDirty();
+      }
+
+      function autosaveNow() {
+        try {
+          localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(state));
+          elStorageInfo.textContent = estimateLocalStorageUsage();
+          elAutosavePill.textContent = "Autosave: on";
+        } catch (e) {
+          elAutosavePill.textContent = "Autosave: failed";
+          console.warn("Autosave failed:", e);
+        }
+      }
+
+      async function autosaveToFolderIfPossible() {
+        if (!folderHandle) return;
+        try {
+          const fileName = "_autosave_writing_organiser.json";
+          const fileHandle = await folderHandle.getFileHandle(fileName, { create: true });
+          const writable = await fileHandle.createWritable();
+          await writable.write(JSON.stringify(state, null, 2));
+          await writable.close();
+        } catch (e) {
+          console.warn("Folder autosave failed:", e);
+        }
+      }
+
+      function startAutosaveLoop() {
+        if (autosaveTimer) clearInterval(autosaveTimer);
+        autosaveTimer = setInterval(async () => {
+          autosaveNow();
+          await autosaveToFolderIfPossible();
+        }, AUTOSAVE_INTERVAL_MS);
+      }
+
+      // -----------------------------
+      // Save / Open (download fallback + File System Access API when available)
+      // -----------------------------
+      function buildFilePayload() {
+        return {
+          app: "Writing Organisers",
+          fileVersion: 1,
+          savedAt: nowISO(),
+          data: state
+        };
+      }
+
+      function suggestFilename() {
+        const tool = getTool(state.toolId);
+        const safeTitle = (state.title || tool.name || "Writing Organiser")
+          .trim()
+          .replace(/[\\/:*?"<>|]+/g, "-")
+          .replace(/\s+/g, " ")
+          .slice(0, 60);
+        return `${safeTitle || "Writing Organiser"}.json`;
+      }
+
+      async function saveFile() {
+        const payload = JSON.stringify(buildFilePayload(), null, 2);
+
+        // If folder handle exists, save there first.
+        if (folderHandle) {
+          try {
+            const fname = suggestFilename();
+            const fileHandle = await folderHandle.getFileHandle(fname, { create: true });
+            const writable = await fileHandle.createWritable();
+            await writable.write(payload);
+            await writable.close();
+            lastSavedPath = fname;
+            setStatusSaved(`Saved to folder: ${fname}`);
+            return;
+          } catch (e) {
+            console.warn("Folder save failed, falling back to download:", e);
+          }
+        }
+
+        // Fallback: normal browser download.
+        const blob = new Blob([payload], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = suggestFilename();
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(a.href);
+        setStatusSaved("Saved (downloaded JSON file)");
+      }
+
+      async function openFile() {
+        // Use picker when available; fallback to hidden input
+        if (window.showOpenFilePicker) {
+          try {
+            const [handle] = await window.showOpenFilePicker({
+              types: [{ description: "Writing Organiser File", accept: { "application/json": [".json"] } }],
+              multiple: false
+            });
+            const file = await handle.getFile();
+            const text = await file.text();
+            loadFromText(text, file.name);
+            return;
+          } catch (e) {
+            if (e && e.name === "AbortError") return;
+            alert("Could not open file. Try again, or use a different browser.");
+            return;
+          }
+        }
+
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json,application/json";
+        input.addEventListener("change", async () => {
+          const file = input.files && input.files[0];
+          if (!file) return;
+          const text = await file.text();
+          loadFromText(text, file.name);
+        });
+        input.click();
+      }
+
+      function loadFromText(text, name) {
+        const parsed = safeJsonParse(text);
+        if (!parsed) {
+          alert("That file doesn’t look like valid JSON.");
+          return;
+        }
+
+        // Accept either raw state, or wrapped payload
+        let incoming = null;
+        if (parsed && parsed.data && parsed.data.toolId) {
+          incoming = parsed.data;
+        } else if (parsed && parsed.toolId) {
+          incoming = parsed;
+        }
+
+        if (!incoming || !incoming.toolId) {
+          alert("That file doesn’t look like a Writing Organisers save file.");
+          return;
+        }
+
+        // Basic sanity: tool exists
+        if (!getTool(incoming.toolId)) {
+          alert("This file uses an organiser type this version doesn’t recognise.");
+          return;
+        }
+
+        state = incoming;
+        state.updatedAt = nowISO();
+        lastSavedPath = name || "";
+        setStatusSaved(`Opened: ${name || "file"}`);
+        render();
+        autosaveNow();
+      }
+
+      async function pickFolder() {
+        if (!window.showDirectoryPicker) {
+          alert("Folder saving needs Chrome or Edge (File System Access API). You can still use Save (download) + Open.");
+          return;
+        }
+        try {
+          folderHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+          setStatusSaved("Folder access granted");
+          await autosaveToFolderIfPossible();
+        } catch (e) {
+          if (e && e.name === "AbortError") return;
+          alert("Could not access that folder.");
+        }
+      }
+
+      // -----------------------------
+      // Row controls (per tool)
+      // -----------------------------
+      function addRow() {
+        const tool = getTool(state.toolId);
+
+        if (tool.kind === "table2") {
+          state.rows.push({ a: "", b: "" });
+        } else if (tool.kind === "table3") {
+          state.rows.push({ a: "", b: "", c: "" });
+        } else if (tool.kind === "flow") {
+          state.rows.push({ step: state.rows.length + 1, text: "" });
+        } else if (tool.kind === "qae") {
+          state.rows.push({ q: "", a: "", e: "" });
+        } else if (tool.kind === "storyboard") {
+          state.rows.push({ frame: state.rows.length + 1, scene: "", notes: "" });
+        } else if (tool.kind === "venn") {
+          state.rows.left.push("");
+          state.rows.right.push("");
+          state.rows.overlap.push("");
+        } else if (tool.kind === "ychart") {
+          state.rows.looks.push("");
+          state.rows.sounds.push("");
+          state.rows.feels.push("");
+        } else if (tool.kind === "mindmap") {
+          // Add node at current view center
+          const cx = (400 - mmOffset.dx) / mmScale;
+          const cy = (300 - mmOffset.dy) / mmScale;
+          const id = Date.now();
+          state.rows.nodes.push({
+            id, x: cx, y: cy, baseX: cx, baseY: cy,
+            text: "New thought", color: "#3B82F6",
+            floatAngle: Math.random() * 2 * Math.PI, floatSpeed: 0.005, floatRadius: 5
+          });
+        } else if (tool.kind === "teel_english" || tool.kind === "teel_hass" || tool.kind === "peel") {
+          let labels = [];
+          if (tool.kind === "teel_english") {
+            labels = ["Topic Sentence", "Explain", "Evidence", "Link"];
+          } else if (tool.kind === "teel_hass" || tool.kind === "peel") {
+            labels = ["Topic Sentence", "Explain", "Evidence", "Evaluate Evidence", "Link"];
+          }
+          labels.forEach(l => state.rows.push({ label: l, text: "" }));
+        } else if (tool.kind === "cornell") {
+          state.rows.rows.push({ cue: "", note: "" });
+        }
+
+        markUpdated();
+        render();
+      }
+
+      function removeRow() {
+        const tool = getTool(state.toolId);
+
+        if (tool.kind === "table2" || tool.kind === "table3" || tool.kind === "flow" || tool.kind === "qae" || tool.kind === "storyboard") {
+          if (state.rows.length > 1) state.rows.pop();
+        } else if (tool.kind === "teel_english" || tool.kind === "teel_hass" || tool.kind === "peel") {
+          const count = (tool.kind === "teel_english") ? 4 : 5;
+          if (state.rows.length > count) {
+            for (let i = 0; i < count; i++) state.rows.pop();
+          }
+        } else if (tool.kind === "venn") {
+          if (state.rows.left.length > 1) state.rows.left.pop();
+          if (state.rows.right.length > 1) state.rows.right.pop();
+          if (state.rows.overlap.length > 1) state.rows.overlap.pop();
+        } else if (tool.kind === "ychart") {
+          if (state.rows.looks.length <= 1) return;
+          state.rows.looks.pop();
+          state.rows.sounds.pop();
+          state.rows.feels.pop();
+        } else if (tool.kind === "cornell") {
+          if (state.rows.rows.length <= 1) return;
+          state.rows.rows.pop();
+        } else {
+          return;
+        }
+
+        markUpdated();
+        render();
+      }
+
+      // -----------------------------
+      // Events
+      // -----------------------------
+      elToolSelect.addEventListener("change", () => {
+        const newId = elToolSelect.value;
+        // Keep title, but reset organiser content for the new type
+        const oldTitle = state.title || "";
+        resetState(newId);
+        state.title = oldTitle;
+        render();
+      });
+
+      elDocTitle.addEventListener("input", () => {
+        state.title = elDocTitle.value;
+        markUpdated();
+      });
+
+      btnNew.addEventListener("click", () => resetState(elToolSelect.value));
+      btnSave.addEventListener("click", saveFile);
+      btnOpen.addEventListener("click", openFile);
+      btnAddRow.addEventListener("click", addRow);
+      btnRemoveRow.addEventListener("click", removeRow);
+
+      btnPrint.addEventListener("click", () => window.print());
+      btnExportPDF.addEventListener("click", () => window.print());
+      btnPickFolder.addEventListener("click", pickFolder);
+      btnCopyWord.addEventListener("click", copyForWord);
+
+      async function copyForWord() {
+        const tool = getTool(state.toolId);
+        let out = "";
+
+        if (state.title) {
+          out += state.title.toUpperCase() + "\n";
+          out += "=".repeat(state.title.length) + "\n\n";
+        } else {
+          out += tool.name.toUpperCase() + "\n";
+          out += "=".repeat(tool.name.length) + "\n\n";
+        }
+
+        switch (tool.kind) {
+          case "table2":
+          case "table3":
+            state.rows.forEach(r => {
+              if (r.a || r.b || r.c) {
+                out += `[${tool.headers[0]}]: ${r.a || ""}\n`;
+                out += `[${tool.headers[1]}]: ${r.b || ""}\n`;
+                if (tool.headers[2]) out += `[${tool.headers[2]}]: ${r.c || ""}\n`;
+                out += "---\n";
+              }
+            });
+            break;
+
+          case "ychart":
+            out += "LOOKS LIKE:\n";
+            state.rows.looks.forEach(v => { if (v) out += `• ${v}\n`; });
+            out += "\nSOUNDS LIKE:\n";
+            state.rows.sounds.forEach(v => { if (v) out += `• ${v}\n`; });
+            out += "\nFEELS LIKE:\n";
+            state.rows.feels.forEach(v => { if (v) out += `• ${v}\n`; });
+            break;
+
+          case "venn":
+            out += "DIFFERENT (LEFT):\n";
+            state.rows.left.forEach(v => { if (v) out += `• ${v}\n`; });
+            out += "\nSAME (OVERLAP):\n";
+            state.rows.overlap.forEach(v => { if (v) out += `• ${v}\n`; });
+            out += "\nDIFFERENT (RIGHT):\n";
+            state.rows.right.forEach(v => { if (v) out += `• ${v}\n`; });
+            break;
+
+          case "cornell":
+            if (state.rows.goal) out += `LEARNING GOAL: ${state.rows.goal}\n\n`;
+            out += "CUES & NOTES:\n";
+            state.rows.rows.forEach(r => {
+              if (r.cue || r.note) {
+                out += `? ${r.cue || ""}\n`;
+                out += `> ${r.note || ""}\n`;
+                out += "---\n";
+              }
+            });
+            if (state.rows.summary) out += `\nSUMMARY: ${state.rows.summary}\n`;
+            break;
+
+          case "kwl":
+            state.rows.forEach(r => {
+              if (r.k || r.w || r.l) {
+                out += `KNOW: ${r.k || ""}\n`;
+                out += `WANT: ${r.w || ""}\n`;
+                out += `LEARNED: ${r.l || ""}\n`;
+                out += "---\n";
+              }
+            });
+            break;
+
+          case "teel_english":
+          case "teel_hass":
+            state.rows.forEach((r, idx) => {
+              if (r.text) {
+                out += `${r.label.toUpperCase()}: ${r.text}\n`;
+                // Add separator between paragraphs
+                const perP = (tool.kind === "teel_english") ? 4 : 5;
+                if ((idx + 1) % perP === 0) out += "\n";
+              }
+            });
+            break;
+
+          case "flow":
+            state.rows.forEach(r => {
+              if (r.text) out += `${r.step}. ${r.text}\n`;
+            });
+            break;
+
+          case "mindmap":
+            out += "IDEAS:\n";
+            state.rows.nodes.forEach(n => {
+              out += `• ${n.text}\n`;
+            });
+            break;
+
+          case "causeeffect":
+            out += "CAUSES:\n";
+            state.rows.forEach(r => {
+              if (r.a) out += `• ${r.a}\n`;
+            });
+            out += `\nEFFECT: ${state.meta.effect || ""}\n`;
+            break;
+
+          case "qae":
+            state.rows.forEach(r => {
+              if (r.q || r.a || r.e) {
+                out += `QUESTION: ${r.q || ""}\n`;
+                out += `ANSWER: ${r.a || ""}\n`;
+                out += `EVIDENCE: ${r.e || ""}\n`;
+                out += "---\n";
+              }
+            });
+            break;
+
+          case "storyboard":
+            state.rows.forEach(r => {
+              if (r.scene || r.notes) {
+                out += `FRAME ${r.frame}:\n`;
+                out += `SCENE: ${r.scene || ""}\n`;
+                out += `NOTES: ${r.notes || ""}\n`;
+                out += "---\n";
+              }
+            });
+            break;
+
+          default:
+            out += "Raw data export not available for this tool.";
+        }
+
+        try {
+          await navigator.clipboard.writeText(out.trim());
+          const oldText = btnCopyWord.textContent;
+          btnCopyWord.textContent = "Copied!";
+          btnCopyWord.classList.add("secondary");
+          setTimeout(() => {
+            btnCopyWord.textContent = oldText;
+            btnCopyWord.classList.remove("secondary");
+          }, 2000);
+        } catch (err) {
+          alert("Could not copy to clipboard. Please select and copy manually.");
+        }
+      }
+
+      // Warn on close if unsaved changes (best effort)
+      window.addEventListener("beforeunload", (e) => {
+        if (dirtySinceSave) {
+          e.preventDefault();
+          e.returnValue = "";
+        }
+      });
+
+      // -----------------------------
+      // Initialise
+      // -----------------------------
+      function populateToolSelect() {
+        TOOLS.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t.id;
+          opt.textContent = t.name;
+          elToolSelect.appendChild(opt);
+        });
+      }
+
+      function loadAutosaveIfAny() {
+        const saved = localStorage.getItem(AUTOSAVE_KEY);
+        if (!saved) return false;
+        const parsed = safeJsonParse(saved);
+        if (!parsed || !parsed.toolId) return false;
+
+        // tool sanity check
+        if (!TOOLS.some(t => t.id === parsed.toolId)) return false;
+
+        state = parsed;
+        state.updatedAt = nowISO();
+        setStatusSaved("Restored from autosave");
+        return true;
+      }
+
+      function ensureDefaults() {
+        const tool = getTool(state.toolId);
+        // If PEEL tool, ensure labels consistent
+        if (tool.kind === "peel") {
+          applyFrameworkLabels();
+        }
+      }
+
+      populateToolSelect();
+
+      // Check URL params first
+      const params = new URLSearchParams(window.location.search);
+      const toolParam = params.get("tool");
+
+      const restored = loadAutosaveIfAny();
+      if (toolParam && TOOLS.some(t => t.id === toolParam)) {
+        resetState(toolParam);
+      } else if (!restored) {
+        resetState(TOOLS[0].id);
+      } else {
+        elToolSelect.value = state.toolId;
+      }
+
+      ensureDefaults();
+      render();
+      autosaveNow();
+      startAutosaveLoop();
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1330 @@
+<!doctype html>
+<html lang="en-AU">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teacher Apps & Websites Library</title>
+
+  <style>
+    :root {
+      /* Pure Modern Blue Theme */
+      --blue-dark: #0f172a;
+      --blue-main: #2563eb;
+      --blue-hover: #1d4ed8;
+      --blue-light: #eff6ff;
+      --blue-accent: #60a5fa;
+
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+
+      --radius: 16px;
+      --shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
+      --focus: rgba(37, 99, 235, 0.2);
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(900px 500px at 10% 0%, #eaf1ff, transparent 60%),
+        radial-gradient(900px 600px at 90% 20%, #fff7dc, transparent 60%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    a {
+      color: var(--blue-main);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: auto;
+      padding: 28px 18px 48px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .headerLeft {
+      min-width: 260px;
+    }
+
+    h1 {
+      margin: 0 0 6px 0;
+      font-size: 26px;
+      color: var(--blue-dark);
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 72ch;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .headerRight {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    .pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--blue-light);
+      border: 1px solid var(--border);
+      color: var(--blue-dark);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--blue-main);
+      background: var(--blue-main);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    }
+
+    .btnGold:active {
+      transform: translateY(1px);
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--blue-main);
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    .search-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr auto;
+      gap: 16px;
+      align-items: flex-end;
+    }
+
+    @media (max-width: 860px) {
+      .search-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .search-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn-secondary {
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--blue-dark);
+      font-weight: 650;
+      cursor: pointer;
+      width: 100%;
+      transition: var(--transition);
+    }
+
+    .btn-secondary:hover {
+      background: var(--blue-light);
+      border-color: var(--blue-accent);
+    }
+
+    .metaRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 4px;
+      font-size: 13px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    @media (max-width:960px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width:620px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow: hidden;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      border-color: var(--blue-accent);
+    }
+
+    /* Pinned tiles get a subtle blue glow/tint */
+    .card.pinned {
+      background: linear-gradient(180deg, rgba(37, 99, 235, 0.05), #ffffff 60%);
+      border-color: var(--blue-accent);
+      border-width: 2px;
+    }
+
+    .cardTop {
+      display: block;
+    }
+
+    .gear-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      font-size: 11px;
+      padding: 0;
+      opacity: 0.6;
+    }
+
+    .gear-btn:hover {
+      background: rgba(31, 95, 168, 0.12);
+      opacity: 1;
+    }
+
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      font-size: 18px;
+    }
+
+    .close-btn:hover {
+      background: #f1f5f9;
+      color: #ef4444;
+    }
+
+    .gearBtn:active {
+      transform: translateY(1px);
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 750;
+      color: var(--blue-dark);
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      margin: 0;
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 4.5em;
+      /* 3 lines * 1.5 line-height */
+    }
+
+    .card-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 4px 0;
+    }
+
+    .chip {
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      background: var(--blue-light);
+      border: 1px solid var(--border);
+      color: var(--blue-dark);
+    }
+
+    .chip-blue {
+      background: var(--blue-light);
+      border-color: var(--blue-accent);
+      color: var(--blue-main);
+      font-weight: 650;
+    }
+
+    .chip.pin {
+      background: #fff;
+      border-color: var(--blue-main);
+      color: var(--blue-dark);
+      font-weight: 750;
+    }
+
+    .card-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .link-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--blue-main);
+      background: var(--blue-main);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .link-btn:hover {
+      background: var(--blue-hover);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+    }
+
+    .dl-btn {
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--blue-accent);
+      background: var(--blue-light);
+      color: var(--blue-main);
+      font-size: 13px;
+      font-weight: 650;
+      white-space: nowrap;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    .dl-btn:hover {
+      background: var(--blue-main);
+      color: white;
+    }
+
+    .small-url {
+      font-size: 11px;
+      color: var(--muted);
+      word-break: break-all;
+      margin-top: 4px;
+      width: 100%;
+      display: block;
+    }
+
+    .empty {
+      margin-top: 18px;
+      padding: 20px;
+      border-radius: var(--radius);
+      border: 2px dashed var(--border);
+      text-align: center;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    footer {
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 10000;
+      transition: var(--transition);
+    }
+
+    .modal {
+      width: min(720px, 100%);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: var(--blue-light);
+    }
+
+    .modalTitle {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--blue-dark);
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 680px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .modal-footer {
+      padding: 20px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      background: #fff;
+    }
+
+    .helper {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      margin-top: 6px;
+    }
+
+    .inlineNote {
+      background: var(--blue-light);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--blue-dark);
+      line-height: 1.45;
+    }
+
+    .checkRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .checkRow input {
+      width: auto;
+    }
+
+    .xBtn {
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 8px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--blue-dark);
+    }
+
+    .xBtn:hover {
+      background: #f2f5fb;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="header-content">
+        <h1>Teacher App Library</h1>
+        <p>A curated collection of educational tools and resources for modern classrooms.</p>
+      </div>
+      <div class="headerRight">
+        <span class="pill" id="countPill">0 tools</span>
+        <button class="btn-primary" id="addNewBtn" type="button">+ Add New Resource</button>
+      </div>
+    </header>
+
+    <section class="search-panel">
+      <div class="search-grid">
+        <div class="form-group">
+          <label for="q">Search Library</label>
+          <input id="q" type="search" class="form-input" placeholder="Search by name, type, or subject..."
+            autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label for="typeFilter">Resource Type</label>
+          <select id="typeFilter" class="form-input"></select>
+        </div>
+        <div class="form-group">
+          <label for="subjectFilter">Subject Area</label>
+          <select id="subjectFilter" class="form-input"></select>
+        </div>
+        <div class="form-group" style="padding-bottom: 2px;">
+          <button class="btn-secondary" id="clearBtn">Reset Filters</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="resultMeta" style="font-size: 13px; color: var(--muted); margin: 12px 0 24px 8px;"></div>
+
+    <section class="grid" id="grid"></section>
+    <div class="empty-state" id="empty" style="display:none;">
+      <h3>No matches found</h3>
+      <p>Try adjusting your search or filters to find what you're looking for.</p>
+    </div>
+
+    <footer>
+      <div>&copy; 2026 Runcorn SHS Library</div>
+      <div class="footer-links">
+        <a href="#" title="Local files should be placed in the 'assets' folder next to this HTML file.">Library Info</a>
+        <a href="mailto:staff@example.edu.au">Report Issue</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Add New Resource</div>
+        <button class="close-btn" id="closeModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label for="newName">Name</label>
+            <input id="newName" type="text" class="form-input" placeholder="App name" />
+          </div>
+          <div class="form-group">
+            <label for="newType">Category</label>
+            <input id="newType" type="text" class="form-input" placeholder="e.g. Maths / Quiz" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="newDesc">Description</label>
+          <textarea id="newDesc" class="form-input" style="min-height: 80px; resize: vertical;"
+            placeholder="Briefly describe how to use this..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="newLink">Primary Link</label>
+          <input id="newLink" type="text" class="form-input" placeholder="URL or assets/filename.html" />
+        </div>
+        <div class="form-group">
+          <label for="newSubjects">Subjects (comma separated)</label>
+          <input id="newSubjects" type="text" class="form-input" placeholder="English, Maths, etc." />
+        </div>
+        <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+          <input id="newPinned" type="checkbox" style="width: auto;" />
+          <label for="newPinned" style="margin: 0;">Pin to top of gallery</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveBtn">Save Resource</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /***********************
+     * Base data (yours)
+     ***********************/
+    const baseTools = [
+      { name: "Kahoot", description: "Quiz tool to engage students.", link: "https://play.kahoot.it/v2/", type: "Quiz", subjects: ["All"] },
+      { name: "Blooket", description: "Quiz to engage students.", link: "https://www.blooket.com/", type: "Quiz", subjects: ["All"] },
+      { name: "Educaplay", description: "Educational game generator (create interactive activities).", link: "https://www.educaplay.com/", type: "Games / Activity builder", subjects: ["All"] },
+      { name: "Quizizz", description: "Quiz tool including flashcards and self-paced modes.", link: "https://quizizz.com/", type: "Quiz / Flashcards", subjects: ["All"] },
+      { name: "Quizlet", description: "Online flashcards and study sets. Login needed for many online activities, but sets can be printed.", link: "https://quizlet.com/", type: "Flashcards / Study", subjects: ["All"] },
+      { name: "Canva", description: "Online graphic design to make engaging learning materials and classroom resources.", link: "https://www.canva.com/", type: "Graphic design / Resources", subjects: ["Arts", "Design & Technologies", "English", "All"] },
+      { name: "Padlet", description: "Collaborative space (discussion boards, timelines, walls). Can be anonymous.", link: "https://padlet.com/", type: "Collaboration space", subjects: ["All"] },
+      { name: "Classroom Screen", description: "Classroom display tools: timers, widgets, instructions, whiteboard-style tools.", link: "https://classroomscreen.com/", type: "Classroom display / Whiteboard tools", subjects: ["All"] },
+      { name: "ClickView", description: "Video repository for schools.", link: "https://www.clickview.net/secondary", type: "Videos / Media library", subjects: ["All"] },
+      { name: "Online Stopwatch", description: "Visual stopwatch and timers.", link: "https://www.online-stopwatch.com/", type: "Timer / Stopwatch", subjects: ["Mathematics", "HPE", "All"] },
+      { name: "ClassTools Random Name Picker", description: "Random selector plus other classroom tools.", link: "https://www.classtools.net/random-name-picker/", type: "Random selector / Classroom tools", subjects: ["All"] },
+      { name: "PhET Interactive Simulations", description: "Interactive simulations for teaching and learning.", link: "https://phet.colorado.edu/", type: "Interactive simulations", subjects: ["Science", "Mathematics"] },
+      { name: "My Computer Brain", description: "Free computer courses.", link: "https://mycomputerbrain.net/", type: "Online courses", subjects: ["Digital Technologies", "eLearning"] },
+      { name: "Low Earth Orbit Visualisation (LeoLabs)", description: "Live 3D visualisation of objects orbiting Earth.", link: "https://platform.leolabs.space/visualization", type: "3D visualisation", subjects: ["Science", "HASS"] },
+      { name: "Notable People Globe", description: "3D Earth view showing birthplaces of notable people.", link: "https://tjukanovt.github.io/notable-people", type: "3D visualisation", subjects: ["HASS", "English"] },
+      { name: "Neal.fun", description: "A collection of fun interactive apps to stimulate curiosity.", link: "https://neal.fun/", type: "Interactive curiosities", subjects: ["All"] },
+      { name: "Townscaper", description: "Relaxed town-building tool (great for design thinking and discussion).", link: "https://oskarstalberg.com/Townscaper/", type: "Game / Creative sandbox", subjects: ["HASS", "Design & Technologies", "Arts"] },
+      { name: "OpenGuessr (Geo guessing)", description: "Geolocation guessing game.", link: "https://openguessr.com/", type: "Game", subjects: ["HASS"] },
+      { name: "TypingClub (edclub)", description: "Typing game and lessons.", link: "https://www.edclub.com/sportal/program-3.game", type: "Typing", subjects: ["English", "Digital Technologies", "eLearning"] },
+      { name: "FocusWriter", description: "Distraction-reduced writing application (install).", link: "https://gottcode.org/focuswriter/", type: "Installable writing app", subjects: ["English", "Wellbeing"] },
+      { name: "Eyecandy (film effects)", description: "Reference site for film techniques and effects (learn the language of filmmaking).", link: "https://eyecannndy.com/", type: "Film reference", subjects: ["Film & TV", "Arts"] },
+      { name: "Workout.cool", description: "Create custom workouts and routines.", link: "https://www.workout.cool/en", type: "Workout builder", subjects: ["HPE"] },
+      { name: "ColorifyAI (colouring pages)", description: "Colouring-in page generator.", link: "https://colorifyai.art/?utm_source=chatgpt.com#coloring-page", type: "Image generator", subjects: ["Arts", "Design & Technologies", "All"] },
+      { name: "Email tracker (note)", description: "Track who is using your email (staff use). Add your preferred link or remove if not needed.", link: "", type: "Email / Staff utility", subjects: ["Staff"] },
+      { name: "Chronas Map", description: "Interactive historical map.", link: "https://www.chronas.org", type: "Interactive map", subjects: ["HASS"] },
+      { name: "Open Library", description: "Free books and borrowing library.", link: "https://openlibrary.org/", type: "Book library", subjects: ["English", "HASS"] },
+      { name: "Citywalki", description: "Video walking tours (useful for prompts, writing, geography, cultural studies).", link: "https://www.citywalki.com/", type: "Video walks", subjects: ["HASS", "English", "Languages"] },
+      { name: "ENTERTRAINED", description: "Learn to type while reading a book.", link: "https://entertrained.app/", type: "Typing / Reading", subjects: ["English", "Digital Technologies"] },
+      { name: "Mindmap (local file)", description: "Free mindmap tool made by Myles. Download and share. Great for visualising and planning.", link: "assets/Mindmap.html", type: "Mindmap", subjects: ["All"], local: true },
+      { name: "Adobe Express", description: "Online design tool for quick classroom graphics, videos, and pages.", link: "https://new.express.adobe.com/?guid=7d7da176-3cb4-4da3-8746-5fa36bf8b436&product=Creative+Cloud+Desktop&product-version=6.7.0.278", type: "Graphic design / Media", subjects: ["Arts", "English", "Design & Technologies", "All"] },
+      { name: "Writing organisers (local file)", description: "School organisers for student and teacher use. Assists students with writing.", link: "assets/WritingOrganisers.html", type: "Writing support", subjects: ["English", "AVID"], local: true },
+      {
+        name: "Hattie Reflection Game",
+        description: "Gamified reflection tool aligned to Hattie’s Visible Learning concepts.",
+        link: "assets/Hattie_reflection - Game.html",
+        type: "Reflection / Professional learning",
+        subjects: ["Staff", "All"],
+        local: true
+      },
+      {
+        name: "Homework Organiser",
+        description: "Simple homework planning and organisation tool for students.",
+        link: "assets/Homeworkorganiser.html",
+        type: "Organisation / Study skills",
+        subjects: ["All"],
+        local: true
+      },
+      {
+        name: "Imposter Word Generator",
+        description: "Vocabulary and discussion tool that introduces an ‘imposter’ word for critical thinking.",
+        link: "assets/imposter word.html",
+        type: "Vocabulary / Thinking routine",
+        subjects: ["English", "HASS", "All"],
+        local: true
+      },
+      {
+        name: "Name Randomiser",
+        description: "Random name picker for classroom questioning and group selection.",
+        link: "assets/Name_randomiser.html",
+        type: "Random selector",
+        subjects: ["All"],
+        local: true
+      },
+      {
+        name: "Prompt Logger",
+        description: "Tool for logging and reflecting on AI prompts used by students or teachers.",
+        link: "assets/promt_logger.html",
+        type: "AI / Reflection",
+        subjects: ["Digital Technologies", "Staff"],
+        local: true
+      },
+      {
+        name: "Reading Routines",
+        description: "Pack of structured reading routines to support consistent literacy practices.",
+        link: "assets/Reading Routines.zip",
+        type: "Reading / Literacy",
+        subjects: ["English", "AVID"],
+        local: true
+      },
+
+    ];
+
+    /***********************
+     * Storage (custom tools)
+     ***********************/
+    const STORAGE_CUSTOM_KEY = "teacherToolsCustom_v2";
+    const STORAGE_OVERRIDES_KEY = "teacherToolsOverrides_v1";
+    const STORAGE_PINNED_KEY = "teacherToolsPinnedSlots_v1";
+
+    function slugify(str) {
+      return String(str || "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+    }
+
+    function makeBaseId(name) {
+      return `base_${slugify(name)}`;
+    }
+
+    function makeCustomId() {
+      return `custom_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    }
+
+    function loadCustomTools() {
+      try {
+        // Migrate old key if present
+        const legacyRaw = localStorage.getItem("teacherToolsCustom_v1");
+        if (legacyRaw && !localStorage.getItem(STORAGE_CUSTOM_KEY)) {
+          localStorage.setItem(STORAGE_CUSTOM_KEY, legacyRaw);
+        }
+
+        const raw = localStorage.getItem(STORAGE_CUSTOM_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        const cleaned = parsed
+          .filter(t => t && typeof t.name === "string")
+          .map((t, idx) => ({
+            id: String(t.id || "").trim() || `custom_migrated_${slugify(t.name)}_${idx}`,
+            name: String(t.name || "").trim(),
+            description: String(t.description || "").trim(),
+            link: String(t.link || "").trim(),
+            type: String(t.type || "").trim() || "Other",
+            subjects: Array.isArray(t.subjects) ? t.subjects : (String(t.subjects || "").split(",").map(s => s.trim()).filter(Boolean)),
+            local: !!t.local
+          }));
+
+        // If we had to add ids, save back so the data stays stable.
+        if (cleaned.some(t => String(t.id).startsWith("custom_migrated_"))) {
+          saveCustomTools(cleaned);
+        }
+
+        return cleaned;
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCustomTools(customTools) {
+      localStorage.setItem(STORAGE_CUSTOM_KEY, JSON.stringify(customTools));
+    }
+
+    function loadOverrides() {
+      try {
+        const raw = localStorage.getItem(STORAGE_OVERRIDES_KEY);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        return (parsed && typeof parsed === "object") ? parsed : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveOverrides(overrides) {
+      localStorage.setItem(STORAGE_OVERRIDES_KEY, JSON.stringify(overrides));
+    }
+
+    function loadPinnedSlots() {
+      try {
+        const raw = localStorage.getItem(STORAGE_PINNED_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function savePinnedSlots(pinned) {
+      localStorage.setItem(STORAGE_PINNED_KEY, JSON.stringify(pinned));
+    }
+
+    /***********************
+     * App state
+     ***********************/
+    let customTools = loadCustomTools();
+    let overrides = loadOverrides();
+    let pinnedSlots = loadPinnedSlots();
+
+    function applyOverride(tool) {
+      const o = overrides[tool.id];
+      if (!o) return tool;
+      return {
+        ...tool,
+        name: (o.name != null) ? String(o.name) : tool.name,
+        description: (o.description != null) ? String(o.description) : tool.description,
+        link: (o.link != null) ? String(o.link) : tool.link,
+        type: (o.type != null) ? String(o.type) : tool.type,
+        subjects: Array.isArray(o.subjects) ? o.subjects : tool.subjects
+      };
+    }
+
+    function buildTools() {
+      const base = baseTools.map(t => ({
+        id: makeBaseId(t.name),
+        ...t
+      }));
+      const merged = [...base, ...customTools];
+      return merged.map(applyOverride);
+    }
+
+    function ensureDefaultPinned(tools) {
+      if (Array.isArray(pinnedSlots) && pinnedSlots.length) return;
+      const writing = tools.find(t => normalise(t.name) === normalise("Writing organisers (local file)"));
+      if (writing) {
+        pinnedSlots = [writing.id];
+        savePinnedSlots(pinnedSlots);
+      }
+    }
+
+    let tools = buildTools();
+    ensureDefaultPinned(tools);
+
+    /***********************
+     * DOM helpers
+     ***********************/
+    const $ = (id) => document.getElementById(id);
+
+    function normalise(str) {
+      return (str || "").toString().toLowerCase().trim();
+    }
+
+    function uniqueSorted(arr) {
+      return [...new Set(arr)].sort((a, b) => a.localeCompare(b));
+    }
+
+    function buildOption(selectEl, value) {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = value;
+      selectEl.appendChild(opt);
+    }
+
+    function isExternalHttp(link) {
+      return /^https?:\/\//i.test(link || "");
+    }
+
+    function isFileLikeLink(link) {
+      const l = (link || "").trim();
+      if (!l) return false;
+
+      // local relative paths
+      if (/^(assets\/|\.\/|..\/)/i.test(l)) return true;
+
+      // file protocol
+      if (/^file:\/\//i.test(l)) return true;
+
+      // Windows UNC path
+      if (/^\\\\/i.test(l)) return true;
+
+      // common “looks like a file” extensions
+      if (/\.(pdf|docx?|pptx?|xlsx?|csv|zip|png|jpe?g|webp|gif|mp4|mov|html?)$/i.test(l)) return true;
+
+      return false;
+    }
+
+    function safeHostname(link) {
+      try {
+        return new URL(link).hostname;
+      } catch {
+        return "";
+      }
+    }
+
+    function refreshData() {
+      tools = buildTools();
+      // keep pinned ids that still exist
+      const ids = new Set(tools.map(t => t.id));
+      pinnedSlots = (pinnedSlots || []).filter(id => ids.has(id));
+      savePinnedSlots(pinnedSlots);
+      initFilters();
+      render();
+    }
+
+    /***********************
+     * Download helper
+     * - For http(s): download works for same-origin files or if server allows CORS.
+     * - For local relative paths (assets/): usually works if served via a server, may be blocked for file:// pages.
+     * - For file:// and \\server paths: browsers generally block programmatic downloads for security.
+     *   We still provide the button; if blocked, user will get a clear message.
+     ***********************/
+    async function tryDownload(link, suggestedName) {
+      const l = (link || "").trim();
+      if (!l) {
+        alert("No file link to download.");
+        return;
+      }
+
+      // Hard block: most browsers won't allow fetching file:// or UNC paths
+      if (/^file:\/\//i.test(l) || /^\\\\/i.test(l)) {
+        alert("Your browser will usually block downloading from file:// or \\\\network paths.\n\nTip: Open it at school, then use the app/page’s own download/export option, or copy the file into your assets folder and link it as assets/YourFile.ext.");
+        return;
+      }
+
+      // If it's an http(s) or relative path, attempt fetch + download blob
+      try {
+        const res = await fetch(l, { mode: "cors" });
+        if (!res.ok) throw new Error(`Download failed: ${res.status}`);
+
+        const blob = await res.blob();
+
+        // Determine filename
+        let filename = "";
+        const cd = res.headers.get("content-disposition") || "";
+        const match = cd.match(/filename\*?=(?:UTF-8''|")?([^\";]+)/i);
+        if (match && match[1]) filename = decodeURIComponent(match[1].replace(/"/g, "").trim());
+
+        if (!filename) {
+          // last segment
+          const parts = l.split("/").filter(Boolean);
+          filename = parts.length ? parts[parts.length - 1] : (suggestedName || "download");
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert(
+          "Could not download this file automatically.\n\nCommon reasons:\n" +
+          "• The file is only accessible on the school network\n" +
+          "• The server blocks downloads (CORS)\n" +
+          "• The page is opened as file:// and the browser restricts fetch\n\n" +
+          "Try opening the file at school and saving a copy, then link that copy from assets/."
+        );
+      }
+    }
+
+    /***********************
+     * Filters
+     ***********************/
+    function initFilters() {
+      const typeFilter = $("typeFilter");
+      const subjectFilter = $("subjectFilter");
+
+      typeFilter.innerHTML = "";
+      subjectFilter.innerHTML = "";
+
+      buildOption(typeFilter, "All types");
+      buildOption(subjectFilter, "All subjects");
+
+      const types = uniqueSorted(tools.map(t => t.type).filter(Boolean));
+      const subjectList = tools.flatMap(t => (t.subjects || [])).filter(Boolean);
+      // Always include AVID as a subject option, even if no tiles are tagged yet.
+      if (!subjectList.includes("AVID")) subjectList.push("AVID");
+      const subjects = uniqueSorted(subjectList);
+
+      types.forEach(t => buildOption(typeFilter, t));
+      subjects.forEach(s => buildOption(subjectFilter, s));
+    }
+
+    /***********************
+     * Render
+     ***********************/
+    function render() {
+      const q = normalise($("q").value);
+      const typePick = $("typeFilter").value;
+      const subjectPick = $("subjectFilter").value;
+
+      const pinnedSet = new Set(pinnedSlots || []);
+      const pinnedTools = (pinnedSlots || [])
+        .map(id => tools.find(t => t.id === id))
+        .filter(Boolean);
+
+      const unpinned = tools.filter(t => !pinnedSet.has(t.id));
+
+      const filteredUnpinned = unpinned.filter(t => {
+        const matchesQ =
+          !q ||
+          normalise(t.name).includes(q) ||
+          normalise(t.description).includes(q) ||
+          normalise(t.type).includes(q) ||
+          (t.subjects || []).some(s => normalise(s).includes(q));
+
+        const matchesType = (typePick === "All types") || (t.type === typePick);
+        const matchesSubject = (subjectPick === "All subjects") || ((t.subjects || []).includes(subjectPick));
+
+        return matchesQ && matchesType && matchesSubject;
+      });
+
+      const listToShow = [...pinnedTools, ...filteredUnpinned];
+
+      $("countPill").textContent = `${tools.length} tools`;
+      $("resultMeta").textContent = `Showing ${listToShow.length} of ${tools.length} (Pinned: ${pinnedTools.length})`;
+
+      const grid = $("grid");
+      grid.innerHTML = "";
+
+      $("empty").style.display = listToShow.length ? "none" : "block";
+
+      listToShow.forEach(t => {
+        const card = document.createElement("div");
+        card.className = pinnedSet.has(t.id) ? "card pinned" : "card";
+
+        const gear = document.createElement("button");
+        gear.className = "gear-btn";
+        gear.type = "button";
+        gear.title = "Edit Resource";
+        gear.innerHTML = "⚙";
+        gear.addEventListener("click", () => openEditModal(t.id));
+        card.appendChild(gear);
+
+        const header = document.createElement("div");
+        header.className = "card-header";
+        const name = document.createElement("h3");
+        name.className = "card-title";
+        if (pinnedSet.has(t.id)) {
+          name.innerHTML = `📌 ${t.name}`;
+        } else {
+          name.textContent = t.name;
+        }
+        header.appendChild(name);
+        card.appendChild(header);
+
+        const desc = document.createElement("p");
+        desc.className = "card-desc";
+        desc.textContent = t.description || "No description provided.";
+        card.appendChild(desc);
+
+        const chips = document.createElement("div");
+        chips.className = "card-chips";
+
+        if (pinnedSet.has(t.id)) {
+          const pinnedChip = document.createElement("span");
+          pinnedChip.className = "chip chip-blue";
+          pinnedChip.textContent = "Pinned";
+          chips.appendChild(pinnedChip);
+        }
+
+        const typeChip = document.createElement("span");
+        typeChip.className = "chip chip-blue";
+        typeChip.textContent = t.type || "Other";
+        chips.appendChild(typeChip);
+
+        (t.subjects || []).forEach(s => {
+          const c = document.createElement("span");
+          c.className = "chip";
+          c.textContent = s;
+          chips.appendChild(c);
+        });
+        card.appendChild(chips);
+
+        const footer = document.createElement("div");
+        footer.className = "card-footer";
+
+        const link = (t.link || "").trim();
+
+        if (link) {
+          const btnRow = document.createElement("div");
+          btnRow.className = "btn-row";
+          footer.appendChild(btnRow);
+
+          const open = document.createElement("a");
+          open.className = "link-btn";
+          open.href = link;
+
+          if (isExternalHttp(link)) {
+            open.target = "_blank";
+            open.rel = "noopener noreferrer";
+            open.textContent = "Open Link";
+          } else {
+            open.textContent = "Open File";
+          }
+          btnRow.appendChild(open);
+
+          if (isFileLikeLink(link)) {
+            const dl = document.createElement("button");
+            dl.className = "dl-btn";
+            dl.type = "button";
+            dl.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download`;
+            dl.addEventListener("click", () => tryDownload(link, t.name));
+            btnRow.appendChild(dl);
+          }
+
+          const small = document.createElement("span");
+          small.className = "small-url";
+          small.textContent = isExternalHttp(link) ? safeHostname(link) : link;
+          footer.appendChild(small);
+        } else {
+          const small = document.createElement("span");
+          small.className = "small-url";
+          small.textContent = "No link available";
+          footer.appendChild(small);
+        }
+        card.appendChild(footer);
+
+        grid.appendChild(card);
+      });
+    }
+
+    /***********************
+     * Pinning
+     ***********************/
+    function isPinned(id) {
+      return (pinnedSlots || []).includes(id);
+    }
+
+    function pinTile(id) {
+      if (!id) return;
+      pinnedSlots = pinnedSlots || [];
+      if (pinnedSlots.includes(id)) return;
+      if (pinnedSlots.length >= 3) {
+        alert("Only three tiles can be pinned at once. Unpin one first.");
+        $("newPinned").checked = false;
+        return;
+      }
+      pinnedSlots.push(id);
+      savePinnedSlots(pinnedSlots);
+    }
+
+    function unpinTile(id) {
+      pinnedSlots = (pinnedSlots || []).filter(x => x !== id);
+      savePinnedSlots(pinnedSlots);
+    }
+
+    /***********************
+     * Modal (Add + Edit)
+     ***********************/
+    let modalMode = "add"; // add | edit
+    let editingId = null;
+
+    function openAddModal() {
+      modalMode = "add";
+      editingId = null;
+      $("modalTitle").textContent = "Add a new app / website";
+      $("saveBtn").className = "btn-primary";
+      $("saveBtn").style.width = "auto";
+      $("saveBtn").textContent = "Save Resource";
+      clearModalFields();
+      $("modalOverlay").style.display = "flex";
+      $("modalOverlay").setAttribute("aria-hidden", "false");
+      $("newName").focus();
+    }
+
+    function openEditModal(id) {
+      const t = tools.find(x => x.id === id);
+      if (!t) return;
+      modalMode = "edit";
+      editingId = id;
+      $("modalTitle").textContent = "Edit tile";
+      $("saveBtn").textContent = "Save changes";
+
+      $("newName").value = t.name || "";
+      $("newType").value = t.type || "";
+      $("newDesc").value = t.description || "";
+      $("newLink").value = t.link || "";
+      $("newSubjects").value = (t.subjects || []).join(", ");
+      $("newPinned").checked = isPinned(id);
+
+      $("modalOverlay").style.display = "flex";
+      $("modalOverlay").setAttribute("aria-hidden", "false");
+      $("newName").focus();
+    }
+
+    function closeModal() {
+      $("modalOverlay").style.display = "none";
+      $("modalOverlay").setAttribute("aria-hidden", "true");
+      clearModalFields();
+    }
+
+    function clearModalFields() {
+      $("newName").value = "";
+      $("newType").value = "";
+      $("newDesc").value = "";
+      $("newLink").value = "";
+      $("newSubjects").value = "";
+      $("newPinned").checked = false;
+    }
+
+    function parseSubjects(str) {
+      const arr = String(str || "")
+        .split(",")
+        .map(s => s.trim())
+        .filter(Boolean);
+      return arr.length ? arr : ["All"];
+    }
+
+    function saveToolFromModal() {
+      const name = String($("newName").value || "").trim();
+      const type = String($("newType").value || "").trim() || "Other";
+      const description = String($("newDesc").value || "").trim();
+      const link = String($("newLink").value || "").trim();
+      const subjects = parseSubjects($("newSubjects").value);
+      const wantsPinned = !!$("newPinned").checked;
+
+      if (!name) {
+        alert("Please enter an app / website name.");
+        $("newName").focus();
+        return;
+      }
+
+      if (modalMode === "add") {
+        const id = makeCustomId();
+        const tool = {
+          id,
+          name,
+          type,
+          description,
+          link,
+          subjects,
+          local: !isExternalHttp(link) && !!link
+        };
+
+        customTools.push(tool);
+        saveCustomTools(customTools);
+
+        if (wantsPinned) pinTile(id);
+        refreshData();
+        closeModal();
+        return;
+      }
+
+      // Edit mode (store changes as overrides so base tiles can be edited too)
+      const id = editingId;
+      if (!id) return;
+      overrides[id] = { name, type, description, link, subjects };
+      saveOverrides(overrides);
+
+      if (wantsPinned) pinTile(id);
+      else unpinTile(id);
+
+      refreshData();
+      closeModal();
+    }
+
+    /***********************
+     * Init + events
+     ***********************/
+    function init() {
+      initFilters();
+      render();
+
+      $("q").addEventListener("input", render);
+      $("typeFilter").addEventListener("change", render);
+      $("subjectFilter").addEventListener("change", render);
+
+      $("clearBtn").addEventListener("click", () => {
+        $("q").value = "";
+        $("typeFilter").value = "All types";
+        $("subjectFilter").value = "All subjects";
+        render();
+        $("q").focus();
+      });
+
+      $("addNewBtn").addEventListener("click", openAddModal);
+      $("closeModalBtn").addEventListener("click", closeModal);
+      $("cancelBtn").addEventListener("click", closeModal);
+      $("saveBtn").addEventListener("click", saveToolFromModal);
+
+      $("modalOverlay").addEventListener("click", (e) => {
+        if (e.target === $("modalOverlay")) closeModal();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && $("modalOverlay").style.display === "flex") {
+          closeModal();
+        }
+      });
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
