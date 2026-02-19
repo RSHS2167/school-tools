@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Visible Learning: Retro Reflection Quest</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#070a12;
+    --ink:#e8f1ff;
+    --muted:#9bb1d8;
+    --glow:#5de3ff;
+    --gold:#ffd84a;
+    --bad:#ff4d4d;
+
+    --blue:#2aa7ff;      /* desired */
+    --green:#46d07f;     /* teacher effects */
+    --amber:#ffb020;     /* developmental */
+    --red:#ff4d4d;       /* reverse */
+
+    --radius:14px;
+    --shadow: 0 14px 40px rgba(0,0,0,.45);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:
+      radial-gradient(900px 500px at 20% -10%, rgba(93,227,255,.18), transparent 60%),
+      radial-gradient(700px 450px at 95% 10%, rgba(255,216,74,.12), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+  .pixel{font-family:"Press Start 2P", system-ui, sans-serif; letter-spacing:.5px}
+
+  header{
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    padding:14px 12px;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:0 12px}
+  .top{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+  h1{margin:0;font-size:18px}
+  .sub{margin:6px 0 0;color:var(--muted);font-size:13px;max-width:75ch}
+
+  .hud{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+  .hudBox{
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(0,0,0,.22);
+    padding:10px 12px;border-radius:12px;
+    min-width:170px;
+    box-shadow:0 10px 25px rgba(0,0,0,.35);
+  }
+  .hudBox .label{color:var(--muted);font-size:11px}
+  .hudBox .value{font-weight:900;font-size:16px;margin-top:6px}
+  .hudSmall{min-width:130px}
+
+  main{padding:18px 0 34px}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:16px;
+  }
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  .muted{color:var(--muted);font-size:13px;line-height:1.35}
+
+  .field{display:grid;gap:6px;margin-bottom:12px}
+  label{font-weight:800;font-size:12px;color:var(--muted)}
+  input[type="text"], input[type="date"], textarea{
+    width:100%;
+    background:rgba(0,0,0,.25);
+    border:1px solid rgba(255,255,255,.14);
+    color:var(--ink);
+    border-radius:12px;
+    padding:11px 12px;
+    outline:none;
+  }
+  textarea{min-height:110px;resize:vertical;font-size:13px}
+
+  .progress{
+    height:12px;background:rgba(255,255,255,.08);
+    border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.12)
+  }
+  .progress > div{
+    height:100%;width:0%;
+    background:linear-gradient(90deg, var(--gold), var(--glow));
+  }
+  .pill{
+    display:inline-flex;gap:8px;align-items:center;
+    background:rgba(0,0,0,.24);
+    border:1px solid rgba(255,255,255,.12);
+    padding:8px 10px;border-radius:999px;
+    font-size:12px;color:var(--muted);white-space:nowrap
+  }
+  .spark{width:10px;height:10px;border-radius:3px;background:var(--glow);box-shadow:0 0 16px rgba(93,227,255,.8)}
+
+  .missionWrap{margin-top:12px;border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
+  .mHead{
+    display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;
+    padding:12px;background:rgba(0,0,0,.22);
+    border-bottom:1px solid rgba(255,255,255,.10);
+  }
+  .mTitle{display:flex;gap:10px;align-items:center}
+  .badge{
+    font-family:"Press Start 2P", system-ui, sans-serif;
+    font-size:10px;
+    padding:8px 10px;border-radius:10px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.06);
+  }
+  .badge.desired{border-color:rgba(42,167,255,.5); color:#bfe7ff}
+  .badge.teacher{border-color:rgba(70,208,127,.5); color:#c8ffe0}
+  .badge.dev{border-color:rgba(255,176,32,.6); color:#ffe3b2}
+  .badge.rev{border-color:rgba(255,77,77,.6); color:#ffd0d0}
+
+  .mBody{padding:12px;background:rgba(0,0,0,.18)}
+  .mission{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:10px;
+    padding:12px;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:12px;
+    background:rgba(0,0,0,.18);
+    margin-bottom:10px;
+  }
+  .mission:last-child{margin-bottom:0}
+  .mName{font-weight:1000}
+  .mMeta{color:var(--muted);font-size:12px;margin-top:4px}
+
+  .choices{
+    display:grid;
+    grid-template-columns: repeat(5, minmax(54px, 1fr));
+    gap:8px;
+    align-items:center;
+  }
+  .choiceBtn{
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.06);
+    color:var(--ink);
+    border-radius:12px;
+    padding:10px 8px;
+    text-align:center;
+    font-weight:1000;
+    cursor:pointer;
+    user-select:none;
+  }
+  .choiceBtn small{display:block;color:var(--muted);font-weight:700;font-size:10px;margin-top:6px}
+  .choiceBtn.selected{
+    border-color: rgba(93,227,255,.65);
+    box-shadow: 0 0 0 3px rgba(93,227,255,.18);
+    background: rgba(93,227,255,.12);
+  }
+
+  .warnBox{
+    display:none;
+    margin-top:12px;
+    border:1px solid rgba(255,176,32,.55);
+    background:rgba(255,176,32,.10);
+    padding:10px 12px;border-radius:14px;color:#ffe3b2;font-size:13px
+  }
+
+  .nav{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .nav button, .actions button{
+    cursor:pointer;border-radius:12px;padding:11px 12px;font-weight:1000;
+    border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--ink);
+  }
+  .nav button.primary, .actions button.primary{
+    border-color: rgba(93,227,255,.5);
+    background: rgba(93,227,255,.14);
+  }
+  .nav button:disabled{opacity:.45;cursor:not-allowed}
+
+  .toast{
+    position:fixed;left:12px;bottom:12px;
+    background:rgba(0,0,0,.72);
+    border:1px solid rgba(255,255,255,.14);
+    color:var(--ink);
+    padding:10px 12px;border-radius:14px;
+    box-shadow:0 16px 40px rgba(0,0,0,.45);
+    transform: translateY(20px);
+    opacity:0; pointer-events:none;
+    transition: all .22s ease;
+    max-width: min(520px, calc(100vw - 24px));
+    font-size:13px;
+    z-index:50;
+  }
+  .toast.show{transform: translateY(0); opacity:1}
+
+  .err{
+    display:none;
+    margin-top:12px;
+    border:1px solid rgba(255,77,77,.55);
+    background:rgba(255,77,77,.10);
+    padding:10px 12px;border-radius:14px;color:#ffd0d0;font-size:13px
+  }
+
+  /* Report */
+  .report{display:none}
+  .report h2{margin:0 0 8px;font-size:18px}
+  .metaTags{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 14px}
+  .tag{border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.22);padding:8px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
+  .scale{
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;padding:12px;background:rgba(0,0,0,.18);
+  }
+  .scaleTitle{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  .big{font-size:26px;font-weight:1000}
+  .rank{
+    font-family:"Press Start 2P", system-ui, sans-serif;
+    font-size:12px;
+    padding:10px 12px;border-radius:12px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.06);
+  }
+  .bar{
+    position:relative;height:16px;border-radius:999px;overflow:hidden;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.08);
+    margin-top:10px;
+  }
+  .seg{height:100%;float:left}
+  .seg.rev{background:rgba(255,77,77,.65);width:23.8095%}
+  .seg.dev{background:rgba(255,176,32,.65);width:9.5238%}
+  .seg.teacher{background:rgba(70,208,127,.65);width:9.5238%}
+  .seg.desired{background:rgba(42,167,255,.65);width:57.1429%}
+  .marker{
+    position:absolute;top:-6px;
+    width:0;height:0;
+    border-left:7px solid transparent;
+    border-right:7px solid transparent;
+    border-top:12px solid #fff;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.6));
+  }
+  .ticks{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:8px}
+  .ticks strong{color:var(--ink)}
+  .twoCol{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+  @media(min-width:900px){.twoCol{grid-template-columns:1fr 1fr}}
+  .list{
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;
+    background:rgba(0,0,0,.18);
+    overflow:hidden;
+  }
+  .row{
+    display:grid;
+    grid-template-columns: 1fr 110px 110px;
+    gap:10px;
+    padding:12px;
+    border-top:1px solid rgba(255,255,255,.10);
+    align-items:start;
+  }
+  .row:first-child{border-top:none}
+  .row .name{font-weight:1000}
+  .row .meta2{grid-column:1 / 4;color:var(--muted);font-size:12px;margin-top:6px}
+  .chip{display:inline-block;border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:7px 10px;font-size:12px;color:var(--muted);text-align:center}
+  .imgBox{
+    margin-top:12px;border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;overflow:hidden;background:rgba(0,0,0,.18);
+  }
+  .imgBox img{width:100%;display:block}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+  /* Explosion particles */
+  #fxLayer{
+    position:fixed;left:0;top:0;right:0;bottom:0;
+    pointer-events:none;
+    z-index:9999;
+  }
+  .px{
+    position:absolute;
+    width:8px;height:8px;
+    image-rendering:pixelated;
+    border-radius:2px;
+    box-shadow: 0 0 10px rgba(93,227,255,.25);
+    will-change: transform, opacity;
+    transform: translate3d(0,0,0);
+    opacity:1;
+  }
+  @keyframes pop {
+    0%   { transform: translate3d(0,0,0) scale(1); opacity:1; }
+    70%  { opacity:1; }
+    100% { transform: translate3d(var(--dx), var(--dy), 0) scale(0.6); opacity:0; }
+  }
+
+  .no-print {}
+  @media print{
+    header, .nav, .warnBox, .actions, .toast, .err, .no-print, #fxLayer { display:none !important; }
+    body { background:#fff; color:#000; }
+    .card { box-shadow:none; border:1px solid #ccc; background:#fff; }
+    .scale, .list, .imgBox { border:1px solid #ccc; background:#fff; }
+    .muted, .tag, .ticks { color:#333 !important; }
+    .marker{border-top-color:#000; filter:none;}
+    @page{size:A4;margin:14mm;}
+  }
+</style>
+</head>
+
+<body>
+<header>
+  <div class="wrap top">
+    <div>
+      <h1 class="pixel">VISIBLE LEARNING: RETRO REFLECTION QUEST</h1>
+      <div class="sub">Answer missions across multiple levels. Finish to reveal your Impact Rank and compare to the scale.</div>
+    </div>
+
+    <div class="hud no-print" id="hud">
+      <div class="hudBox hudSmall">
+        <div class="label pixel">LEVEL</div>
+        <div class="value" id="hudLevel">1</div>
+      </div>
+      <div class="hudBox">
+        <div class="label pixel">XP</div>
+        <div class="value" id="hudXP">0</div>
+      </div>
+      <div class="hudBox">
+        <div class="label pixel">MISSIONS DONE</div>
+        <div class="value" id="hudDone">0/0</div>
+      </div>
+      <div class="hudBox hudSmall">
+        <div class="label pixel">MENU</div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="pixel" id="hdrReset" style="padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--ink);cursor:pointer">RESET</button>
+          <button class="pixel" id="hdrReport" style="padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--ink);cursor:pointer">REPORT</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap grid">
+    <section class="card" id="surveyCard">
+
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div class="pill"><span class="spark"></span><span class="pixel" id="pillPage">INTRO</span></div>
+        <div class="pill"><span class="pixel">PROGRESS</span> <span id="progText">0%</span></div>
+      </div>
+
+      <div style="margin-top:10px">
+        <div class="progress"><div id="bar"></div></div>
+      </div>
+
+      <div class="err" id="errBox"></div>
+
+      <!-- Intro -->
+      <div id="intro" style="margin-top:14px">
+        <div class="field">
+          <label class="pixel" for="tName">PLAYER NAME (optional)</label>
+          <input id="tName" type="text" placeholder="e.g., Ms Nguyen" autocomplete="off"/>
+        </div>
+        <div class="field">
+          <label class="pixel" for="tContext">CLASS CONTEXT (optional)</label>
+          <input id="tContext" type="text" placeholder="e.g., Year 8 Science" autocomplete="off"/>
+        </div>
+        <div class="field">
+          <label class="pixel" for="tDate">DATE</label>
+          <input id="tDate" type="date"/>
+        </div>
+        <div class="field">
+          <label class="pixel" for="tNotes">NOTES (optional)</label>
+          <textarea id="tNotes" placeholder="Evidence you’ve noticed, next steps, what you’re testing, etc."></textarea>
+        </div>
+
+        <div class="nav no-print">
+          <div></div>
+          <div><button class="primary pixel" id="btnStart">START QUEST</button></div>
+        </div>
+      </div>
+
+      <!-- Survey pages -->
+      <div id="survey" style="display:none;margin-top:14px"></div>
+      <div class="warnBox" id="warn">Finish every mission on this level before advancing.</div>
+    </section>
+  </div>
+
+  <!-- Report -->
+  <div class="wrap" style="margin-top:14px">
+    <section class="card report" id="reportCard">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
+        <div>
+          <h2 class="pixel">FINAL BOSS REPORT</h2>
+          <div class="muted" id="reportSub">Your estimated impact position and biggest contributors.</div>
+        </div>
+        <div class="rank pixel" id="rankBox">RANK: —</div>
+      </div>
+
+      <div class="metaTags" id="meta"></div>
+
+      <div class="scale">
+        <div class="scaleTitle">
+          <div>
+            <div class="muted pixel" style="font-size:11px">ESTIMATED EFFECT SIZE</div>
+            <div class="big" id="scoreBig">—</div>
+          </div>
+          <div>
+            <div class="muted pixel" style="font-size:11px">BAND</div>
+            <div class="big" style="font-size:16px" id="bandBig">—</div>
+          </div>
+        </div>
+
+        <div class="bar">
+          <div class="seg rev"></div>
+          <div class="seg dev"></div>
+          <div class="seg teacher"></div>
+          <div class="seg desired"></div>
+          <div class="marker" id="marker"></div>
+        </div>
+
+        <div class="ticks">
+          <div><strong>-0.5</strong></div>
+          <div><strong>0</strong></div>
+          <div><strong>0.2</strong></div>
+          <div><strong>0.4</strong> <span class="muted">(hinge)</span></div>
+          <div><strong>1.6</strong></div>
+        </div>
+
+        <div class="muted" style="margin-top:10px" id="summaryText">—</div>
+      </div>
+
+      <div class="twoCol">
+        <div>
+          <h3 class="pixel" style="margin:14px 0 8px 0;font-size:12px">POWER-UPS (positive)</h3>
+          <div class="list" id="topList"></div>
+        </div>
+        <div>
+          <h3 class="pixel" style="margin:14px 0 8px 0;font-size:12px">TRAPS (negative)</h3>
+          <div class="list" id="riskList"></div>
+        </div>
+      </div>
+
+      <h3 class="pixel" style="margin:14px 0 8px 0;font-size:12px">REFERENCE MAP</h3>
+      <div class="imgBox">
+        <img src="Hattie-VisibleLearning-research-834.webp" alt="Hattie visible learning effect sizes reference scale">
+      </div>
+
+      <div class="actions no-print">
+        <button class="pixel" id="btnBack">BACK</button>
+        <button class="pixel" id="btnSave">SAVE (JSON)</button>
+        <button class="pixel" id="btnLoad">LOAD (JSON)</button>
+        <input id="fileLoad" type="file" accept="application/json" style="display:none"/>
+        <button class="primary pixel" id="btnPrint">EXPORT PDF</button>
+      </div>
+
+      <div class="muted" style="margin-top:12px">PDF export uses the browser print dialog. Choose “Save as PDF”.</div>
+    </section>
+  </div>
+</main>
+
+<div class="toast no-print" id="toast"></div>
+<div id="fxLayer" aria-hidden="true"></div>
+
+<script>
+/* ---------------------------
+   DATA: short mission prompts (mapped 1:1)
+--------------------------- */
+const ITEMS = [
+  // Desired
+  { id:"cte",  label:"Collective teacher efficacy", effect:1.57, band:"desired", q:"Is the team pulling in the same direction?" },
+  { id:"srg",  label:"Self-reported grades", effect:1.33, band:"desired", q:"Do students rate their progress accurately?" },
+  { id:"rti",  label:"Response to intervention", effect:1.29, band:"desired", q:"Do you adjust fast when students struggle?" },
+  { id:"piag", label:"Piagetian programs", effect:1.28, band:"desired", q:"Do you teach from concrete to abstract?" },
+  { id:"cred", label:"Teacher credibility", effect:0.90, band:"desired", q:"Do students trust you and your judgement?" },
+  { id:"disc", label:"Classroom discussion", effect:0.82, band:"desired", q:"Do students talk through ideas, not just answer?" },
+  { id:"clar", label:"Teacher clarity", effect:0.75, band:"desired", q:"Are goals and success criteria crystal clear?" },
+  { id:"feed", label:"Feedback", effect:0.70, band:"desired", q:"Do students use feedback to improve next attempts?" },
+  { id:"dins", label:"Direct instruction", effect:0.60, band:"desired", q:"Do you model, guide, then release to practise?" },
+  { id:"form", label:"Providing formative evaluation", effect:0.48, band:"desired", q:"Do you check understanding during learning?" },
+
+  // Teacher effects
+  { id:"cm",   label:"Classroom management", effect:0.35, band:"teacher", q:"Are routines smooth and time-on-task high?" },
+  { id:"abil", label:"Ability grouping (gifted students)", effect:0.30, band:"teacher", q:"Do you group students flexibly for a purpose?" },
+  { id:"ttc",  label:"Teaching test taking & coaching", effect:0.30, band:"teacher", q:"Do you coach assessment skills without narrowing?" },
+  { id:"home", label:"Homework", effect:0.29, band:"teacher", q:"Is homework purposeful and doable?" },
+  { id:"incl", label:"Mainstreaming / inclusion", effect:0.27, band:"teacher", q:"Do all learners access the core task?" },
+  { id:"rcs",  label:"Reducing class size", effect:0.21, band:"teacher", q:"Is learning solid even with a big class?" },
+
+  // Developmental
+  { id:"team", label:"Co- / team teaching", effect:0.19, band:"dev", q:"Do you co-teach to lift learning outcomes?" },
+  { id:"web",  label:"Web-based learning", effect:0.18, band:"dev", q:"Does online learning actually add value?" },
+  { id:"lapt", label:"One-on-one laptops", effect:0.16, band:"dev", q:"Do devices improve learning, not distract?" },
+  { id:"ment", label:"Mentoring", effect:0.12, band:"dev", q:"Do coaching chats lead to real change?" },
+  { id:"music",label:"Background music", effect:0.10, band:"dev", q:"Does background music help focus?" },
+  { id:"hum",  label:"Humour", effect:0.04, band:"dev", q:"Does humour build rapport without derailing learning?" },
+
+  // Reverse
+  { id:"sum",  label:"Summer vacation effect", effect:-0.02, band:"rev", q:"Do breaks cause big learning slide-backs?" },
+  { id:"sleep",label:"Lack of sleep", effect:-0.05, band:"rev", q:"Is tiredness killing learning in your room?" },
+  { id:"susp", label:"Suspension/expelling students", effect:-0.20, band:"rev", q:"Are removals hurting learning momentum?" },
+  { id:"ret",  label:"Retention (holding students back)", effect:-0.32, band:"rev", q:"Is year repetition harming progress/wellbeing?" },
+  { id:"move", label:"Moving between schools", effect:-0.34, band:"rev", q:"Do student moves disrupt learning a lot?" },
+  { id:"bore", label:"Boredom", effect:-0.49, band:"rev", q:"Is boredom a common enemy in your class?" },
+];
+
+const BAND_LABEL = {
+  desired:"ZONE OF DESIRED EFFECTS",
+  teacher:"TEACHER EFFECTS",
+  dev:"DEVELOPMENTAL EFFECTS",
+  rev:"REVERSE EFFECTS"
+};
+
+const state = {
+  page: 0,
+  perPage: 6,
+  answers: {},      // id -> 1..5
+  xp: 0,
+  level: 1,
+  lastReport: null
+};
+
+const SCALE_MIN = -0.5;
+const SCALE_MAX = 1.6;
+const LS_KEY = "visible_learning_retro_v2";
+
+const el = (id) => document.getElementById(id);
+const clamp = (x,a,b) => Math.max(a, Math.min(b, x));
+
+/* ---------------------------
+   Safety net: show any JS errors in-page
+--------------------------- */
+window.addEventListener("error", (e) => {
+  const box = el("errBox");
+  box.style.display = "block";
+  box.textContent = "Script error: " + (e.message || "Unknown") + " (check console for details)";
+});
+
+/* ---------------------------
+   Retro explosion effect on click
+--------------------------- */
+(function setupExplosions(){
+  const layer = el("fxLayer");
+  let last = 0;
+
+  // simple palette, pixel-y
+  const colours = ["#5de3ff", "#ffd84a", "#46d07f", "#ff4d4d", "#b7c7ff"];
+
+  function spawnExplosion(x, y){
+    const now = performance.now();
+    if(now - last < 30) return; // limiter (about 33 fps)
+    last = now;
+
+    const count = 14;
+    for(let i=0;i<count;i++){
+      const p = document.createElement("div");
+      p.className = "px";
+      p.style.left = (x - 4) + "px";
+      p.style.top = (y - 4) + "px";
+      p.style.background = colours[(Math.random()*colours.length)|0];
+
+      // random velocity
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 40 + Math.random() * 70;
+      const dx = Math.cos(ang) * dist;
+      const dy = Math.sin(ang) * dist;
+
+      p.style.setProperty("--dx", dx.toFixed(1) + "px");
+      p.style.setProperty("--dy", dy.toFixed(1) + "px");
+
+      // random duration
+      const dur = 320 + Math.random() * 260;
+      p.style.animation = `pop ${dur.toFixed(0)}ms ease-out forwards`;
+
+      layer.appendChild(p);
+      setTimeout(() => p.remove(), dur + 50);
+    }
+  }
+
+  document.addEventListener("click", (e) => {
+    const tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : "";
+    // still allow explosions on inputs, but avoid annoying when selecting text
+    spawnExplosion(e.clientX, e.clientY);
+  }, { passive:true });
+})();
+
+/* ---------------------------
+   UI helpers
+--------------------------- */
+function setDefaultDate(){
+  const d = el("tDate");
+  if (d.value) return;
+  const today = new Date();
+  const iso = new Date(today.getTime() - today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  d.value = iso;
+}
+setDefaultDate();
+
+function paginate(){
+  const total = ITEMS.length;
+  const pages = Math.max(1, Math.ceil(total / state.perPage));
+  state.page = Math.max(0, Math.min(state.page, pages-1));
+  return { total, pages };
+}
+
+function answeredCount(){ return Object.keys(state.answers).length; }
+
+function setHUD(){
+  const total = ITEMS.length;
+  el("hudLevel").textContent = state.level;
+  el("hudXP").textContent = state.xp;
+  el("hudDone").textContent = `${answeredCount()}/${total}`;
+}
+
+function setProgress(){
+  const total = ITEMS.length;
+  const answered = answeredCount();
+  const pct = total ? Math.round((answered/total)*100) : 0;
+  el("bar").style.width = pct + "%";
+  el("progText").textContent = pct + "%";
+  setHUD();
+}
+
+function showToast(msg){
+  const t = el("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(()=>t.classList.remove("show"), 1500);
+}
+
+function bandBadge(band){
+  return `<span class="badge ${band}">${BAND_LABEL[band] || band}</span>`;
+}
+
+function levelTitle(page, pages){
+  if(page === pages-1) return "FINAL LEVEL";
+  return `LEVEL ${page+1}`;
+}
+
+function escapeHtml(s){
+  return (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+function choice(val, label, qid, answered){
+  const selected = (answered === val) ? "selected" : "";
+  return `<div class="choiceBtn ${selected}" data-qid="${qid}" data-val="${val}">
+    ${val}<small>${escapeHtml(label)}</small>
+  </div>`;
+}
+
+function pageComplete(){
+  const { total } = paginate();
+  const start = state.page * state.perPage;
+  const end = Math.min(total, start + state.perPage);
+  for(let i=start;i<end;i++){
+    if(!state.answers[ITEMS[i].id]) return false;
+  }
+  return true;
+}
+
+function missingIds(){
+  const miss = [];
+  for(const it of ITEMS){
+    if(!state.answers[it.id]) miss.push(it.id);
+  }
+  return miss;
+}
+
+/* ---------------------------
+   Render survey page
+--------------------------- */
+function renderPage(){
+  const { total, pages } = paginate();
+  const start = state.page * state.perPage;
+  const end = Math.min(total, start + state.perPage);
+
+  state.level = state.page + 1;
+  el("pillPage").textContent = levelTitle(state.page, pages);
+
+  const survey = el("survey");
+  survey.innerHTML = "";
+
+  const bands = {};
+  for(let i=start;i<end;i++){
+    bands[ITEMS[i].band] = (bands[ITEMS[i].band]||0)+1;
+  }
+  const dominantBand = Object.entries(bands).sort((a,b)=>b[1]-a[1])[0]?.[0] || "teacher";
+
+  const wrap = document.createElement("div");
+  wrap.className = "missionWrap";
+  wrap.innerHTML = `
+    <div class="mHead">
+      <div class="mTitle">
+        <div class="pixel" style="font-size:12px">MISSIONS</div>
+        ${bandBadge(dominantBand)}
+      </div>
+      <div class="muted">Pick 1–5: Never → Consistently</div>
+    </div>
+    <div class="mBody" id="mBody"></div>
+  `;
+  survey.appendChild(wrap);
+
+  const mBody = wrap.querySelector("#mBody");
+
+  for(let i=start;i<end;i++){
+    const it = ITEMS[i];
+    const answered = state.answers[it.id];
+
+    const m = document.createElement("div");
+    m.className = "mission";
+    m.innerHTML = `
+      <div>
+        <div class="mName">${escapeHtml(it.q)}</div>
+        <div class="mMeta">${escapeHtml(it.label)} • effect ${it.effect.toFixed(2)} • ${escapeHtml(BAND_LABEL[it.band])}</div>
+      </div>
+      <div class="choices" role="radiogroup" aria-label="${escapeHtml(it.q)}">
+        ${choice(1,"Never", it.id, answered)}
+        ${choice(2,"Rarely", it.id, answered)}
+        ${choice(3,"Sometimes", it.id, answered)}
+        ${choice(4,"Often", it.id, answered)}
+        ${choice(5,"Consistently", it.id, answered)}
+      </div>
+    `;
+    mBody.appendChild(m);
+
+    m.querySelectorAll(".choiceBtn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const id = btn.dataset.qid;
+        const val = Number(btn.dataset.val);
+        const firstTime = !state.answers[id];
+
+        state.answers[id] = val;
+
+        const sibs = btn.parentElement.querySelectorAll(".choiceBtn");
+        sibs.forEach(s => s.classList.toggle("selected", s === btn));
+
+        // XP
+        const gained = firstTime ? (10 + Math.round(Math.abs(it.effect)*6)) : 2;
+        state.xp += gained;
+
+        if(it.effect >= 0.7 && val >= 4) showToast(`POWER-UP! +${gained} XP`);
+        else if(it.effect < 0 && val >= 4) showToast(`TRAP ALERT! +${gained} XP`);
+        else showToast(`+${gained} XP`);
+
+        setProgress();
+        autosave();
+      });
+    });
+  }
+
+  const nav = document.createElement("div");
+  nav.className = "nav no-print";
+  nav.innerHTML = `
+    <div><button class="pixel" id="btnPrev">PREV</button></div>
+    <div><button class="primary pixel" id="btnNext">${state.page === pages-1 ? "FINISH & VIEW REPORT" : "NEXT"}</button></div>
+  `;
+  survey.appendChild(nav);
+
+  el("btnPrev").onclick = () => {
+    state.page--;
+    renderPage();
+    window.scrollTo({top:0, behavior:"smooth"});
+  };
+
+  el("btnNext").onclick = () => {
+    if(!pageComplete()){
+      el("warn").style.display = "block";
+      showToast("Finish the missions on this level!");
+      window.scrollTo({top:0, behavior:"smooth"});
+      return;
+    }
+    el("warn").style.display = "none";
+
+    if(state.page === pages-1){
+      // Always generate report (even if somehow incomplete)
+      generateReport();
+      showReport(true);
+      window.scrollTo({top:0, behavior:"smooth"});
+    } else {
+      state.page++;
+      renderPage();
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+  };
+
+  el("btnPrev").disabled = (state.page === 0);
+
+  setProgress();
+}
+
+/* ---------------------------
+   Scoring + report
+--------------------------- */
+function score(){
+  let num=0, den=0;
+  const contribs=[];
+  for(const it of ITEMS){
+    const r = state.answers[it.id];
+    if(!r) continue;
+    const m = (r - 1) / 4;      // 0..1
+    const c = m * it.effect;
+    num += c;
+    den += m;
+    contribs.push({ ...it, rating:r, contribution:c });
+  }
+  const scoreVal = den>0 ? (num/den) : 0;
+  return { score: scoreVal, contribs, answered: contribs.length };
+}
+
+function bandFromScore(s){
+  if(s < 0) return { text:"Reverse effects (< 0.00)", colour:"var(--red)" };
+  if(s < 0.2) return { text:"Developmental effects (0.00–0.19)", colour:"var(--amber)" };
+  if(s < 0.4) return { text:"Teacher effects (0.20–0.39)", colour:"var(--green)" };
+  return { text:"Zone of desired effects (≥ 0.40)", colour:"var(--blue)" };
+}
+
+function positionOnScale(s){
+  const p = (s - SCALE_MIN) / (SCALE_MAX - SCALE_MIN);
+  return clamp(p, 0, 1) * 100;
+}
+
+function impactRank(s){
+  if(s >= 1.2) return "S+ LEGEND";
+  if(s >= 0.8) return "S MASTER";
+  if(s >= 0.6) return "A STRONG";
+  if(s >= 0.4) return "B ON TRACK";
+  if(s >= 0.2) return "C BUILDING";
+  if(s >= 0.0) return "D STARTING";
+  return "F DANGER ZONE";
+}
+
+function renderList(targetId, items, emptyText){
+  const box = el(targetId);
+  if(!items.length){
+    box.innerHTML = `<div class="row"><div class="muted">${emptyText}</div><div></div><div></div></div>`;
+    return;
+  }
+  box.innerHTML = items.map(x => `
+    <div class="row">
+      <div>
+        <div class="name">${escapeHtml(x.label)}</div>
+        <div class="meta2">${escapeHtml(BAND_LABEL[x.band])} • effect ${x.effect.toFixed(2)}</div>
+      </div>
+      <div class="chip">${x.rating}/5</div>
+      <div class="chip"><strong>${x.contribution.toFixed(2)}</strong></div>
+    </div>
+  `).join("");
+}
+
+function generateReport(){
+  const total = ITEMS.length;
+  const miss = missingIds();
+
+  const out = score();
+  const b = bandFromScore(out.score);
+  const pct = positionOnScale(out.score);
+  const rank = impactRank(out.score);
+
+  // Fill report fields (no more blank report)
+  el("scoreBig").textContent = out.score.toFixed(2);
+  el("bandBig").textContent = b.text;
+  el("bandBig").style.color = b.colour;
+  el("marker").style.left = `calc(${pct}% - 7px)`;
+  el("rankBox").textContent = `RANK: ${rank}`;
+
+  // Report subtext if incomplete
+  if(miss.length){
+    el("reportSub").textContent = `INCOMPLETE RUN: ${out.answered}/${total} answered. (Report still shown.)`;
+  } else {
+    el("reportSub").textContent = "Your estimated impact position and biggest contributors.";
+  }
+
+  el("summaryText").innerHTML =
+    `Missions complete: <strong>${out.answered}/${total}</strong>. Hinge point is <strong>0.40</strong>. XP earned: <strong>${state.xp}</strong>.`;
+
+  const top = [...out.contribs].filter(x=>x.contribution>0).sort((a,b)=>b.contribution-a.contribution).slice(0,6);
+  const risk = [...out.contribs].filter(x=>x.contribution<0).sort((a,b)=>a.contribution-b.contribution).slice(0,6);
+
+  renderList("topList", top, "No positive contributors found yet.");
+  renderList("riskList", risk, "No negative contributors found yet.");
+
+  const name = el("tName").value.trim() || "Player";
+  const context = el("tContext").value.trim();
+  const date = el("tDate").value || new Date().toISOString().slice(0,10);
+
+  const meta = [];
+  meta.push(`<span class="tag"><span class="pixel" style="font-size:10px">PLAYER</span> ${escapeHtml(name)}</span>`);
+  if(context) meta.push(`<span class="tag"><span class="pixel" style="font-size:10px">CONTEXT</span> ${escapeHtml(context)}</span>`);
+  meta.push(`<span class="tag"><span class="pixel" style="font-size:10px">DATE</span> ${escapeHtml(date)}</span>`);
+  meta.push(`<span class="tag"><span class="pixel" style="font-size:10px">XP</span> ${state.xp}</span>`);
+  meta.push(`<span class="tag"><span class="pixel" style="font-size:10px">RANK</span> ${escapeHtml(rank)}</span>`);
+  if(miss.length) meta.push(`<span class="tag"><span class="pixel" style="font-size:10px">MISSING</span> ${miss.length}</span>`);
+  el("meta").innerHTML = meta.join("");
+
+  state.lastReport = {
+    meta: { name, context, date, notes: el("tNotes").value || "" },
+    answers: state.answers,
+    xp: state.xp,
+    results: {
+      weighted_mean_effect_size: out.score,
+      band: b.text,
+      rank,
+      answered: out.answered,
+      total,
+      missing_ids: miss,
+      generated_at: new Date().toISOString()
+    }
+  };
+
+  autosave();
+}
+
+function showReport(show){
+  el("surveyCard").style.display = show ? "none" : "block";
+  el("reportCard").style.display = show ? "block" : "none";
+}
+
+/* ---------------------------
+   Save/load
+--------------------------- */
+function autosave(){
+  const payload = {
+    meta: {
+      name: el("tName").value || "",
+      context: el("tContext").value || "",
+      date: el("tDate").value || "",
+      notes: el("tNotes").value || ""
+    },
+    answers: state.answers,
+    xp: state.xp,
+    page: state.page,
+    lastReport: state.lastReport
+  };
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(payload)); }catch(e){}
+}
+
+function autoload(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return;
+    const obj = JSON.parse(raw);
+
+    if(obj.meta){
+      el("tName").value = obj.meta.name || "";
+      el("tContext").value = obj.meta.context || "";
+      el("tDate").value = obj.meta.date || el("tDate").value;
+      el("tNotes").value = obj.meta.notes || "";
+    }
+    if(obj.answers) state.answers = obj.answers;
+    if(Number.isFinite(obj.xp)) state.xp = obj.xp;
+    if(Number.isFinite(obj.page)) state.page = obj.page;
+    if(obj.lastReport) state.lastReport = obj.lastReport;
+
+    setProgress();
+  }catch(e){}
+}
+
+function saveJSON(){
+  if(!state.lastReport){
+    generateReport(); // make one anyway
+  }
+  const blob = new Blob([JSON.stringify(state.lastReport, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const safeName = (state.lastReport.meta.name || "player").replace(/[^a-z0-9]+/gi,"_").replace(/^_+|_+$/g,"");
+  a.href = url;
+  a.download = `visible_learning_retro_${safeName}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function loadJSON(file){
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const obj = JSON.parse(reader.result);
+      if(!obj.answers) throw new Error("Missing answers");
+      state.answers = obj.answers;
+      state.xp = obj.xp || 0;
+      state.lastReport = obj;
+
+      if(obj.meta){
+        el("tName").value = obj.meta.name || "";
+        el("tContext").value = obj.meta.context || "";
+        el("tDate").value = obj.meta.date || el("tDate").value;
+        el("tNotes").value = obj.meta.notes || "";
+      }
+
+      el("intro").style.display = "none";
+      el("survey").style.display = "block";
+      el("warn").style.display = "none";
+      showReport(false);
+
+      state.page = 0;
+      renderPage();
+      showToast("Save loaded!");
+    }catch(e){
+      alert("Could not load file: " + e.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function restart(){
+  if(!confirm("Restart quest and clear all progress?")) return;
+  localStorage.removeItem(LS_KEY);
+  state.page = 0;
+  state.answers = {};
+  state.xp = 0;
+  state.level = 1;
+  state.lastReport = null;
+
+  el("intro").style.display = "block";
+  el("survey").style.display = "none";
+  el("warn").style.display = "none";
+  showReport(false);
+
+  setProgress();
+  showToast("Fresh run!");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ---------------------------
+   Start + wiring
+--------------------------- */
+function startQuest(){
+  el("intro").style.display = "none";
+  el("survey").style.display = "block";
+  el("warn").style.display = "none";
+  state.page = 0;
+  renderPage();
+  autosave();
+  showToast("Quest started!");
+}
+
+el("btnStart").addEventListener("click", startQuest);
+el("hdrReset").addEventListener("click", restart);
+
+el("hdrReport").addEventListener("click", () => {
+  // Always generate a report (even if incomplete)
+  generateReport();
+  showReport(true);
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+
+el("btnBack").addEventListener("click", () => {
+  showReport(false);
+  el("intro").style.display = "none";
+  el("survey").style.display = "block";
+  renderPage();
+});
+
+el("btnPrint").addEventListener("click", () => window.print());
+el("btnSave").addEventListener("click", saveJSON);
+el("btnLoad").addEventListener("click", () => el("fileLoad").click());
+el("fileLoad").addEventListener("change", (e) => {
+  const f = e.target.files && e.target.files[0];
+  if(f) loadJSON(f);
+  e.target.value = "";
+});
+
+["tName","tContext","tDate","tNotes"].forEach(id=>{
+  el(id).addEventListener("input", autosave);
+  el(id).addEventListener("change", autosave);
+});
+
+autoload();
+setProgress();
+</script>
+</body>
+</html>
