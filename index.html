@@ -164,9 +164,15 @@
 
     .search-grid {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr auto;
+      grid-template-columns: 1.5fr 1fr 1fr auto auto;
       gap: 16px;
       align-items: flex-end;
+    }
+
+    @media (max-width: 1060px) {
+      .search-grid {
+        grid-template-columns: 1.5fr 1fr 1fr auto;
+      }
     }
 
     @media (max-width: 860px) {
@@ -248,6 +254,17 @@
       transform: translateY(-2px);
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
       border-color: var(--blue-accent);
+    }
+
+    .card.downloadable {
+      background: linear-gradient(180deg, rgba(250, 204, 21, 0.1), #ffffff 60%);
+      border-color: #facc15;
+      border-width: 2px;
+    }
+
+    .card.downloadable.pinned {
+      background: linear-gradient(180deg, rgba(250, 204, 21, 0.15), #ffffff 60%);
+      border-color: #eab308;
     }
 
     /* Pinned tiles get a subtle blue glow/tint */
@@ -587,7 +604,13 @@
           <select id="subjectFilter" class="form-input"></select>
         </div>
         <div class="form-group" style="padding-bottom: 2px;">
-          <button class="btn-secondary" id="clearBtn">Reset Filters</button>
+          <label class="checkRow" style="margin: 0; height: 42px; cursor: pointer; box-sizing: border-box;">
+            <input type="checkbox" id="downloadFilter" />
+            <span style="font-size: 14px; font-weight: 500; color: var(--blue-dark);">Downloadable Only</span>
+          </label>
+        </div>
+        <div class="form-group" style="padding-bottom: 2px;">
+          <button class="btn-secondary" id="clearBtn" style="height: 42px;">Reset Filters</button>
         </div>
       </div>
     </section>
@@ -1021,6 +1044,7 @@
       const q = normalise($("q").value);
       const typePick = $("typeFilter").value;
       const subjectPick = $("subjectFilter").value;
+      const dlOnly = $("downloadFilter").checked;
 
       const pinnedSet = new Set(pinnedSlots || []);
       const pinnedTools = (pinnedSlots || [])
@@ -1039,8 +1063,10 @@
 
         const matchesType = (typePick === "All types") || (t.type === typePick);
         const matchesSubject = (subjectPick === "All subjects") || ((t.subjects || []).includes(subjectPick));
+        const isDl = isFileLikeLink(t.link);
+        const matchesDl = !dlOnly || isDl;
 
-        return matchesQ && matchesType && matchesSubject;
+        return matchesQ && matchesType && matchesSubject && matchesDl;
       });
 
       const listToShow = [...pinnedTools, ...filteredUnpinned];
@@ -1055,7 +1081,9 @@
 
       listToShow.forEach(t => {
         const card = document.createElement("div");
-        card.className = pinnedSet.has(t.id) ? "card pinned" : "card";
+        card.className = "card";
+        if (isFileLikeLink(t.link)) card.classList.add("downloadable");
+        if (pinnedSet.has(t.id)) card.classList.add("pinned");
 
         const gear = document.createElement("button");
         gear.className = "gear-btn";
@@ -1298,11 +1326,13 @@
       $("q").addEventListener("input", render);
       $("typeFilter").addEventListener("change", render);
       $("subjectFilter").addEventListener("change", render);
+      $("downloadFilter").addEventListener("change", render);
 
       $("clearBtn").addEventListener("click", () => {
         $("q").value = "";
         $("typeFilter").value = "All types";
         $("subjectFilter").value = "All subjects";
+        $("downloadFilter").checked = false;
         render();
         $("q").focus();
       });
