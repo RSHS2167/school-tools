@@ -626,8 +626,9 @@
     <footer>
       <div>&copy; 2026 Runcorn SHS Library</div>
       <div class="footer-links">
-        <a href="#" title="Local files should be placed in the 'assets' folder next to this HTML file.">Library Info</a>
-        <a href="mailto:staff@example.edu.au">Report Issue</a>
+        <a href="#" target="_blank" rel="noopener noreferrer"
+          title="Local files should be placed in the 'assets' folder next to this HTML file.">Library Info</a>
+        <a href="mailto:staff@example.edu.au" target="_blank" rel="noopener noreferrer">Report Issue</a>
       </div>
     </footer>
   </div>
@@ -1146,10 +1147,10 @@
           const open = document.createElement("a");
           open.className = "link-btn";
           open.href = link;
+          open.target = "_blank";
+          open.rel = "noopener noreferrer";
 
           if (isExternalHttp(link)) {
-            open.target = "_blank";
-            open.rel = "noopener noreferrer";
             open.textContent = "Open Link";
           } else {
             open.textContent = "Open File";
